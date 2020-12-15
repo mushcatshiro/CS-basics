@@ -52,7 +52,7 @@ there exists many type of data thus single indexing strategy doesn't always do t
 
 or balanced-tree indexes is the default indexing.
 
-![image-20201215204437641](.\image-20201215204437641.png)
+![image-20201215204437641](.\Learning SQL\image-20201215204437641.png)
 
 above is the example of employee.lname B-tree. as more data is being inserted, the database server will try balance the index tree by adding or removing branch nodes to distribute the nodes / values evenly. ? (i recall seeing a slightly different tree structure where leaf node are connected from left to right, **that's a B+ tree**) if we are searching for 'Germaine' thus goes A-M then G-I and the search will stop at H*. as expected we should be expecting on average log(n) search time
 
