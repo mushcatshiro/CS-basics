@@ -67,8 +67,6 @@ fsync = off # i didn't turn off for this
 data_sync_retry = true
 ```
 
-
-
 manual: man psql
 
 pgadmin - gui for psql

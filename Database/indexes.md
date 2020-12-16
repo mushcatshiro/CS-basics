@@ -27,8 +27,6 @@ CREATE TABLE tablemane (
 );
 ```
 
-
-
 running demo table
 
 ```sql
@@ -43,7 +41,8 @@ creating primary key to speed up by making
 - assumption there exists no two duplicated phone number or no two user can exists with same phone number
 
 Side topic on primary key, what if we don't create primary key ourself?
-InnoDB implicitly creates one for us (by design its required), once the user create a primary key later on the auto created one is replaced
+
+> InnoDB implicitly creates one for us (by design its required), once the user create a primary key later on the auto created one is replaced
 
 to check InnoDB default primary key
 
