@@ -20,6 +20,7 @@ SELECT table_name, table_type
 FROM information_schema.tables -- views, columns, statistics, table_constraints and more
 WHERE table_schema = 'bank'
 ORDER BY 1 -- ordinal_position
+-- it would be beneficial if we explicitly type in USE your_database before checking metadata in GUI
 ```
 
 we can query all sorts of information eg. view list, view definition, column information 
