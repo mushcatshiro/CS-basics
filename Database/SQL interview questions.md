@@ -10,3 +10,9 @@ SQL data structure
 
 - B+ tree, why and how?
 - scan and indexing
+
+## sql injection
+
+use sql ? instead of python f-string
+
+## race conditions

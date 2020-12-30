@@ -18,3 +18,10 @@ FROM sqlite_master
 WHERE name = 'albums';
 ```
 
+## importing from flat files to database
+
+````bash
+>> .mode csv # or tsv
+>> .import FILENAME TABLENAME
+>> .schema # check the previous import SQL
+````
