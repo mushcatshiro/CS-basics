@@ -7,7 +7,7 @@ object oriented programming. inheritance is able to win over procedural in the s
 - instance variables: what an object is supposed to know
 - methods: what an object is supposed to do
 
-a class is not an object is a blueprint for an object, it informs jvm on how to create a copy of that object (w/ or w/o different instance variables)
+a class is not an object, its a blueprint for an object, it informs jvm on how to create a copy of that object (w/ or w/o different instance variables)
 
 ```java
 class Cat {
