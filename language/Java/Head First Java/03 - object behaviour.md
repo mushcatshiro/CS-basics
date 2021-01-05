@@ -79,3 +79,20 @@ public boolean equals(Object anObject) {
 }
 ```
 
+### equals and ==
+
+```java
+int a = 100, b = 100;
+int c = 1000000, d = 1000000;
+System.out.println(a == b); // true
+System.out.println(c == d); // true
+Integer a = 100, b = 100;
+Integer c = 1000000, d = 1000000;
+System.out.println(a == b); // true
+System.out.println(c == d); // false
+System.out.println(a.equals(b)); // true
+System.out.println(c.equals(d)); // true
+```
+
+int and Integer are similar, just Integer is a wrapper for int for more operations eg casting from or to string or other format (binary and etc.). reason of Integer showing false is because its using a cache for values between -128 to 127, thus a and b points to same object instead being assigned to the same value.
+
