@@ -15,7 +15,7 @@ class Child_Base(BaseModel):
 class Parent_Base(BaseModel):
     p_id: int
     pname: str
-    childs: List[Child_Base] = []
+    # childs: List[Child_Base] = []
 
     class Config:
         orm_mode = True

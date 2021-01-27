@@ -19,7 +19,7 @@ class Parent(Base):
     children = relationship("Child", back_populates="parents")
 
     def __repr__(self):
-        return '<pname %r, children %r>' % self.pname % self.children
+        return '<pname %r pid %r>' % (self.name, self.p_id)
 
 
 class Child(Base):
@@ -31,6 +31,9 @@ class Child(Base):
 
     parents = relationship("Parent", back_populates="children")
 
+    def __repr__(self):
+        return '<cname %r pid %r cid %r>' % (self.name, self.c_id, self.p_id)
+
 
 # association table (variable)
 
@@ -39,23 +42,30 @@ class Child(Base):
 #     Column('c_id', Integer, ForeignKey('child.c_id'))
 # )
 
+
 # class Parent(Base):
 #     __tablename__ = "parent"
 
 #     p_id = Column(Integer, primary_key=True, index=True)
-#     pname = Column(String, unique=True, index=True)
+#     name = Column(String, unique=True, index=True)
 
 #     children = relationship("Child",
 #                             secondary=association_table,
 #                             back_populates="parents")
+
+#     def __repr__(self):
+#         return '<pname %r pid %r>' % (self.name, self.p_id)
 
 
 # class Child(Base):
 #     __tablename__ = "child"
 
 #     c_id = Column(Integer, primary_key=True, index=True)
-#     cname = Column(String, index=True)
+#     name = Column(String, index=True)
 
 #     parents = relationship("Parent",
 #                            secondary=association_table,
 #                            back_populates="children")
+
+#     def __repr__(self):
+#         return '<cname %r pid %r>' % (self.name, self.c_id)
