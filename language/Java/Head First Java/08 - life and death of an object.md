@@ -100,6 +100,10 @@ class Mini extends Car{
 
 it depends on the references referring to it. it will be kept alive as long as there is references referring to it. a reference variable is either a local variable or an instance variable. a local variable (stack) lives within the method that declared that variable and an instance variable (heap) lives as long as the object does. if a reference variable goes out of the scope but still alive, the object it refers to is still alive on heap. the trick is to know when its GC eligible when we are done with them, else we will see out of memory death.
 
+## on null
+
+if a variable is null, the referenced object is liable to destruction but this variable still exists with bits representing null (but we are not bother what are they, JVM will address it) and any dot operations will raise NullPointerException.
+
 ___
 
 ## six usage of `this` keyword
