@@ -31,10 +31,10 @@ class RDG:
             elif arg.endswith('_bool'):
                 ret[arg] = self.ranBool()
             else:
-                ret[arg] = self.ranText(self.tlen)
+                ret[arg] = self.randString(self.tlen)
         return ret
 
-    def ranText(self, tlen):
+    def randString(self, tlen):
         return ''.join(random.choice(self.letters) for i in range(tlen))
 
     def ranInt(self, mint):
