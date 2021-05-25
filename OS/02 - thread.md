@@ -100,74 +100,13 @@ a state where each member of a group waits for another member (including itself)
 
 a condition where the system substantive behavior is dependent on the sequence or timing of other **uncontrollable** events, or in the case of threads (processes) its the sequence or timing of threads (processes). its difficult to reproduce as the result is non-deterministic.
 
-## 6. scheduling
-
-### 6.1 preemptive scheduling
-
-preemption is the act of temporarily interrupting an executing task with intention of running it later. the interruption is done by external scheduler with no assistance or cooperation from the task. its considered highly secured for each interruption and resuming also such change is known as context switching.
-
-#### 6.1.1 kernel preemption
-
-if not permitted to run to completion, it would tend to produce race condition resulting in deadlock. there is a tradeoff between removing preemptive behavior while processing and system responsiveness. also user mode and kernel mode determines privilege level within the system, and might be used to differentiate if a task is preemptable.
-
-#### 6.1.2 preemptive multitasking
-
-there exists cooperative multitasking where process or task must be explicitly programmed to yield (give up current running thread and add to queue) when they are not needed. its the scheduler determines what to execute next therefore all processes will get **some** amount of CPU time at any given time. this approach allows computer system to deal with important external events. at any specific time, processes are grouped into two category which either IO bound or CPU bound and its the IO bound tasks is blocked and allow to reprioritize other processes to utilize CPU.
-
-#### 6.1.3 Time Slice
-
-the length of time for which a process is allowed to run in preemptive multitasking system. the scheduler is run once every time slice to choose what's next to run. balance between system performance and process responsiveness is critical as scheduler might be consuming too much processing time or processes will take longer to respond. interruption allows OS kernel to switch between processes when the time slice expires allow processor time to be shared between tasks and giving the illusion that these tasks are in parallel.
-
-### 6.2 scheduler
-
-the method where work is assigned to resources to complete work, it could be virtual computation elements (threads, processes) to hardware resources (processors, network links). with scheduler its possible to multitask with single core CPU. a scheduler might have multiple conflicting goals: maximize throughput,minimize wait time, minimize latency, maximize fairness. we determine process scheduler by the frequency of the decisions.
-
-#### 6.2.1 long-term scheduling
-
-decides which processes to be admitted tot he ready queue (main memory). it dictates what process to run on a system and the degree of concurrency to be supported at any given time. its the best interest to mix between IO bound and CPU bound processes else either the ready or waiting queue will be always empty. large scale system might deploy special scheduling software to prevent blocking due to waiting, eg batch processing mapreduce.
-
-#### 6.2.2 medium-term scheduling
-
-temporarily removes processes from main memory and place them in secondary memory (hdd) or vice versa, or swapping in and out. usually it chooses process that are inactive for some time, having low priority, having page faulting frequently or process which takes up large amount of memory. in modern system medium-tier scheduler might actually perform the role of long-term scheduler, by treating binaries as "swapped-out processes" upon execution.
-
-#### 6.2.3 short-term scheduling
-
-decides which of the ready, in-memory processes to be executed after a clock interrupt, IO interrupt, OS syscall or other form of signal for every time slice.
-
-#### 6.2.4 preemtive scheduler
-
-on every time slice, it invokes an interrupt handler that runs in kernel mode and implement the scheduling function.
-
-### 6.3 Dispatcher
-
-gives control of the CPU to the processes selected by short-term scheduler in kernel mode
-
-- context switching where dispatcher saves the state (context) of process or thread and loads the initial or previous state of a new process
-- switching to user mode
-- jump to proper location in the program to restart / resume at the saved state
-
-### 6.4 cooperative scheduling
-
-context switch is never initiated until processes voluntarily yield control periodically or idling or logically blocked. thus a cooperative scheduler's role is reduced down to starting processes and letting them return control voluntarily. it widely used in embedded systems and also `await` languages with single-threaded event-loop in their runtime eg. JS and Python (?) it could potentially cause problem where a single process consumes all CPU time for itself, be it performing extensive computation or busy waiting, which hangs the system. we could alleviate this by using a watchdog timer.
-
-### 6.5 scheduling algorithms
-
-- FIFO
-- Priority scheduling
-- shortest remaining time first
-- fixed priority preemptive scheduling
-- round-robin scheduling
-- multilevel queue scheduling
-- work-conserving scheduling
-- manual scheduling
-
-## 7. Linux Thread
+## 6. Linux Thread
 
 linux does not distinguish between processes and threads instead its referred to "tasks". a `fork()` syscall completely duplicates a task, and `clone()` allows for varying degrees of sharing between parent and child tasks controlled by flags. linux implements `task_struct` thus if no flag is specified the **resources** pointed to by the structure are copied, if flags are set, only the **pointers** to the resources are copied, hence resource sharing. (deep copy vs shallow copy)
 
-## 8. Threading in python 3
+## 7. Threading in python 3
 
-## 9. reference materials
+## 8. reference materials
 
 - https://web.mit.edu/6.005/www/fa14/classes/18-thread-safety/
 - https://www.cs.uic.edu/~jbell/CourseNotes/OperatingSystems/4_Threads.html
