@@ -67,3 +67,7 @@ services:
 - remoting to docker container 
 
 > docker container exec -it containername bash
+
+## addressing the k8s deprecation of docker
+
+what k8s deprecate is the redundant components from docker and decouples the reliance on dockershim. instead it will be using containerd as the container runtime. images build by `docker build` complies to the open container initiative thus images will be runnable in any container runtime including containerd, CRI-O or docker.
