@@ -17,22 +17,19 @@ threading is useful for non-blocking tasks. take flask as an example (flask / py
 
 ### 2.1 Kernel Threads
 
-each process consist of at least one kernel thread, if multiple threads exists within the same process they share memory and file resources (stack, registers, program counter and thread-local storage). kernel threads are preemtively multitasked if OS process schedule is also. they are relatively cheap to create, destroy and execute context switching. kernel can assign one thread to each logical core and can be swapped if it get blocked, however its slower than to swap out user threads
+each process consist of at least one kernel thread, if multiple threads exists within the same process they share memory and file resources (stack, registers, program counter and thread-local storage). kernel threads are preemtively multitasked following the OS process schedule. they are relatively cheap to create, destroy and execute context switching. kernel can assign one thread to each logical core and can be swapped if it get blocked, however its slower than to swap out user threads
 
 ### 2.2 User Threads
 
 sometimes implemented in userspace. kernel is unaware of them thus is scheduled and managed in userspace. no interaction with kernel during context switch thus is extremely efficient and is achieved by locally saving CPU registers used by the user thread to be executed. as the scheduling occurs in userspace, the scheduling policy can be more easily tailored to the requirements of the program's workload. using blocking system call can be problematic, and its blocking until the call returns by the kernel, thus starves other threads in the same process from executing. this is mitigated by implementing an interface that blocks the calling thread than the entire process.
 
-## 3. types of parallelism
+## 3. multithreading
 
-in practice its always hybrid
-
-1. data parallelism: divides data amongst multiple threads (cores), and perform the same task on each subset of the data, similar to mapreduce.
-2. task parallelism: divides different task to be performed among the different threads (cores) and performs them simultaneously.
+threads are effectively processes that run in the same memory context and share other resources with their parent's processes thus *lightweight process* as context switching between threads does not involved switching memory context.
 
 ## 4. multithreading models
 
-there are two types of threads in modern system - user threads and kernel threads. user threads are supported above the kernel without kernel support and these are threads that programmers would put into their programs. kernel threads are supported within the kernel of the OS itself. modern OS supports kernel level threads, allowing kernel to perform multiple simultaneous tasks and / or to service multiple kernel system calls simultaneously. in theory we could map user threads to kernel threads using the following strategy.
+user threads are supported above the kernel without kernel support and these are threads that programmers would put into their programs. kernel threads are supported within the kernel of the OS itself. modern OS supports kernel level threads, allowing kernel to perform multiple simultaneous tasks and / or to service multiple kernel system calls simultaneously. in theory we could map user threads to kernel threads using the following strategy.
 
 ### 4.1 Many(user)-To-One Model
 
@@ -71,11 +68,15 @@ there could be scenario where concurrent reads are guaranteed to be thread-safet
 - conditionally safe - different threads can access different object simultaneously, and access to shared data is protected from race conditions
 - not thread safe - data structures should not be accessed simultaneously by different threads
 
-### 5.3 deadlocks
+### 5.3 race condition
+
+a condition where the system substantive behavior is dependent on the sequence or timing of other **uncontrollable** events, or in the case of threads (or processes) its the sequence or timing of threads (processes). its difficult to reproduce as the result is non-deterministic.
+
+### 5.4 deadlocks
 
 a state where each member of a group waits for another member (including itself) to do some action (usually to release locks for process synchronization) and if no mechanism is implemented to detect / address deadlock the state will be lasted indefinitely.
 
-#### 5.3.1 required condition to form deadlocks
+#### 5.4.1 required condition to form deadlocks
 
 "Coffman conditions"
 
@@ -84,7 +85,7 @@ a state where each member of a group waits for another member (including itself)
 3. no preemption: resource releasing can only be voluntarily
 4. circular wait:
 
-#### 5.3.2 handling deadlocks
+#### 5.4.2 handling deadlocks
 
 - ignoring deadlocks - application of ostrich algorithm, is used when time intervals between occurrences of deadlocks are large and data loss incurred every time is tolerable. it can be safely done if deadlocks are formally proven to never occur or cost of prevention / detection is too high eg RTIC framework or if some deadlock happens every 10 years its easier to just reboot.
 - detection - deadlocks are allowed and the system will examine if deadlock exists and handle accordingly
@@ -95,10 +96,6 @@ a state where each member of a group waits for another member (including itself)
   - resource holding may be removed by requiring processes to request all the resource needed before starting. its difficult to know in advance resource needed and its inefficient. another approach is process can only request for resource if they have none, which might also be impractical because resource might be allocated and remain unused for long period of time. also process requiring popular resource may have to wait indefinitely, as resource may always be allocated to other processes causing resource starvation
   - no preemption might also be difficult or impossible as process has to have a resource for a certain amount of time (non-deterministic) else processing outcome might not be consistent. inability to enforce preemption may interfere with priority algorithm, preempt lock out resource generally implies rollback and significant overhead. algorithms that allow preemption including lock-free, wait-free algorithms and optimistic concurrency control.
 - circular wait avoidance is achieved by disabling interrupts during critical sections and using hierarchy to determine partial ordering of resources. if no hierarchy exists, memory address of resource can be used to determine ordering and resources are requested in the increasing order of enumeration. Dijkstra's solution can also be used.
-
-### 5.4 race condition
-
-a condition where the system substantive behavior is dependent on the sequence or timing of other **uncontrollable** events, or in the case of threads (processes) its the sequence or timing of threads (processes). its difficult to reproduce as the result is non-deterministic.
 
 ## 6. Linux Thread
 
