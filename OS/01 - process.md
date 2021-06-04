@@ -70,7 +70,7 @@ if not permitted to run to completion, it would tend to produce race condition r
 
 #### 2.2.2 preemptive multitasking
 
-there exists cooperative multitasking where process or task must be explicitly programmed to yield (give up current running thread and add to queue) when they are not needed. its the scheduler determines what to execute next therefore all processes will get **some** amount of CPU time at any given time. this approach allows computer system to deal with important external events. at any specific time, processes are grouped into two category which either IO bound or CPU bound and its the IO bound tasks is blocked and allow to reprioritize other processes to utilize CPU.
+there exists cooperative multitasking where process (or task) must be explicitly programmed to yield (give up current running thread and add to queue) when they are not needed. its the scheduler determines what to execute next therefore all processes will get **some** amount of CPU time at any given time. this approach allows computer system to deal with important external events. at any specific time, processes are grouped into two category which either IO bound or CPU bound and its the IO bound tasks is blocked and allow to reprioritize other processes to utilize CPU.
 
 #### 2.2.3 Time Slice
 
@@ -131,6 +131,7 @@ process can create other process through syscall eg. fork or spawn and the creat
 
 ```mermaid
 graph TD
+pid0[shed] --> pid1
 pid1[init] --> pid2[kthreadd]
 pid1 --> pid3[sshd]
 pid1 --> pid4[login]
@@ -147,7 +148,7 @@ depending on implementation, a child process may receive some amount of shared r
 
 options for parents after child process creation
 
-- wait for child process termination before proceeding, by amking a `wait()` syscall, thus parent process is blocked. usually thats the case for unix shell
+- wait for child process termination before proceeding, by making a `wait()` syscall, thus parent process is blocked. usually thats the case for unix shell
 - run concurrently with the child, similar to the `-d` flag used in docker. its also possible for parent to run for some time then wait for the child later by forking off some children without waiting
 
 address space of a child process
