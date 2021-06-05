@@ -111,3 +111,9 @@ http post request are never cached, don't remain in browser history, cant be boo
 ![image-20210603194646365](image-20210603194646365.png)
 
 divides related program logic in to three interconnected elements. its done to separate internal representation of information from the ways information is presented. model could be a data access object, or some abstraction that directly manages data. controller accepts input and converts it to commands for model or view.
+
+## 6. session and cookies (http)
+
+## 7. tokens
+
+## 8. state
