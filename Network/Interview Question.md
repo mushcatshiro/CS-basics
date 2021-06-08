@@ -112,10 +112,36 @@ http post request are never cached, don't remain in browser history, cant be boo
 
 divides related program logic in to three interconnected elements. its done to separate internal representation of information from the ways information is presented. model could be a data access object, or some abstraction that directly manages data. controller accepts input and converts it to commands for model or view.
 
-## 6. session and cookies (http)
+## 6. http cookies
 
-## 7. tokens
+http cookies is a small piece of data that a server sends to the user's web browser (client side storage) and the browser may store it and send it back with later requests (for every request) to the same server. simply its used to tell if two requests came from the same browser - keeping a user logged-in for example. it remembers stateful information for the stateless HTTP protocol. session management, personalization and tracking are the three main purposes for a cookie. its stored in the web storage api (`localStorage` and `sessionStorage`) and IndexedDB.
+
+## 7. sessions
+
+the five horseman of sessions with flask
+
+- user session
+- server side session for authentication
+- flask global variable
+- cookie's key name (inspect Application Cookies)
+- Flask-Session (server side equivalent of Cookies implementation, returns the key instead)
+
+session is a temporary and interactive information interchange between two or more communicating devices or between a computer and user. a session is established at a certain point in time, torn down at some later point. an established communication session may involve more than one message in each direction. its stateful, which at least one of the communicating parties needs to hold current state information and save information about session history to be able to communicate as opposed to stateless communication.
+
+HTTP session is a sequence of network request-response transactions. client initiates a request by establishing TCP connection to port and the server listening at the port receives the request and response back is what a simple HTTP session is.
 
 ## 8. state
 
-## 9. OAuth
+stateful is if a system is designed to remember preceding events or user interactions. examples including FTP and TCP.
+
+stateless protocol is a communication protocol in which the receiver must not retain session state from previous request. the sender transfers relevant session state to the receiver in such a way that every request can be understood in isolation or without reference to session state from previous requests retained by the receiver. examples including HTTP request.
+
+### why stateless?
+
+improves visibility, reliability and scalability. the monitoring system does not have to look beyond a single request in order to determine its full nature thus visibility improved. reliability improved due to it eases the task of recovering from partial failures. scalability arises as no storing session state between requests allows server to free resources and simplifies implementation. however the payload is larger as compared to stateful system and parsing is required per request.
+
+we can observed there is no fully stateful or stateless route, its a mixed between both. HTTP and TCP is one of the examples.
+
+## 9. tokens
+
+## 10. OAuth
