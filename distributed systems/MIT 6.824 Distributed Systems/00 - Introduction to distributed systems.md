@@ -2,9 +2,7 @@
 
 # introduction to distributed systems
 
-> paper of the week: mapreduce
-
-[MapReduce: Simplified Data Processing on Large Clusters](http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf)
+reading: [MapReduce: Simplified Data Processing on Large Clusters](http://static.googleusercontent.com/media/research.google.com/en//archive/mapreduce-osdi04.pdf)
 
 ## why distributed systems? 
 
@@ -216,7 +214,7 @@ the general mechanism to address the problem is to get the master to schedule ba
 
 _____
 
-## some findings on RPC (there is a lecture full on this, this is just a preview)
+##  some findings on RPC (there is a lecture full on this, this is just a preview)
 
 python rpc with rpyc, is this how the "remote code execution engine" works?
 
