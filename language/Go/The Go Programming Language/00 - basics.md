@@ -339,6 +339,13 @@ func zero(ptr *[32]byte) {
 }
 ```
 
+array indexing is a bit different from python where negative indexes are not supported, thus to access the last element we should do the following
+
+```go
+var arr = [3]int{1, 2, 3}
+fmt.Printf(arr[len(arr)-1])
+```
+
 #### slices
 
 variable length sequences whose element of the same type. slice declaration is just array without the size `[]T`. initializing this way will first creates an array and returns the slice of it. a slice consist of three components, pointer, length and capacity. we can re-slice beyond the original slice length as long as it does not exceeds the underlying array length else it panics.
