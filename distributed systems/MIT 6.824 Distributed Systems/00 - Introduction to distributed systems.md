@@ -71,13 +71,13 @@ its not uncommon for single computer to maintain 99.99% if not 100% uptime for l
 
 for us its the goal to mask this faults from our users.
 
-#### metrics 
+### metrics 
 
 - availability (up time)
   - under **certain set of failures** we can still provide service
 - recoverability
 
-#### what's available in the toolbox?
+### what's available in the toolbox?
 
 - non-volatile storage for checkpoint / log for the state of the system, however nv-storage is expensive to update. thus usually a fault tolerant high performance system will have clever ways to avoid writing to non-volatile storage too much.
 - replication and management of replication system, sync issues
@@ -154,16 +154,16 @@ r2-- append result to final output format ---e[end of this reduce partition]
 
 typically there will be total of *R* output (user defined) and no need to combine the outputs into a single file as they are often passed into another mapreduce call or use them from another distributed application that is able to deal with the partitions
 
-#### master's data structure
+### master's data structure
 
 masters stores several data structure. its the conduit where location of intermediate file is passed from map machine to reduce machine
 
 - (for each) map and reduce task's state (idle, in-progress or completed) and the identity of worker machine for non-idle tasks
-- (for each ) completed map task the location of and size of *R* intermediate file region produced by map task
+- (for each) completed map task the location of and size of *R* intermediate file region produced by map task
 
 the information is pushed incrementally to workers that have in-progress reduce task
 
-#### fault tolerance
+### fault tolerance
 
 1. worker failure
    - master check worker's heartbeat periodically, if there is no response in certain amount of time, marks that worker as fail
@@ -177,7 +177,7 @@ the information is pushed incrementally to workers that have in-progress reduce 
    - rely on atomic commits of map and reduce task output to achieve this property
    - for non deterministic task we assume any one worker is equivalent to any single machine but between worker they are different
 
-#### complexity
+### complexity
 
 *M* & *R* will be ideally much larger than the number of worker machines. by having each worker perform many differnt task improves dynamic load balancing and speeds up recovery
 
@@ -189,13 +189,13 @@ master makes
 
 > numbers are what google was using back then
 
-#### backups
+### backups
 
 straggler: a machine that takes unusually long time to complete one of the last few map or reduce task with multiple reason come with it ie competition of computing resources between tasks
 
 the general mechanism to address the problem is to get the master to schedule backup executions of the remaining in-progress tasks, the task is marked as completed whenever either primary or backup execution completes
 
-#### refinements
+### refinements
 
 1. partitioning function: decide which reduce machine should the current map function output to be passed to 
    - default partitioning is provided using hashing (hash(key) mod *R*)

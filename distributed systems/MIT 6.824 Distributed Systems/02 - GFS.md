@@ -30,7 +30,7 @@ write operation (append)
 case 1. no primary on master
 
 1. find up to date replicas
-2. picks one to be primary and seconday, increments version number and returns these three information to client
+2. picks one to be primary and secondary, increments version number and returns these three information to client
 3. master gives a lease to primary
 4. client informs all primary and secondary information to append
 5. primary and secondaries will stage to temp area, wait for received ACK, then primary picks a suitable offset before actually write happens
@@ -45,7 +45,7 @@ case 1. no primary on master
 GFS is not real strong consistency.
 
 - primary be able to detect duplicated requests
-- secondary have to execute the request from primary, and if it has permanant problems there should be a mechanism to remove it as an secondary
+- secondary have to execute the request from primary, and if it has permanent problems there should be a mechanism to remove it as an secondary
 - secondaries should not expose and newly append data until primary is sure that the execution is completed and successful (two phase commit)
 - new primary should resync the tail of their operation when the old primary crashes while it has issued some operations
 - reads from primary only when there is conflicting/stale information and when the secondaries can't legally respond

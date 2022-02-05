@@ -2,7 +2,9 @@
 
 # Primary-Backup Replication
 
-Failures address by replication is fail-stop faults which refers to if anything go wrong the computer just stops. what is not covered by replication are like bugs or design defects of software or hardware etc. other limitations are when the failures are dependent or natural disaster recovery, replication also cant help with it. also do we really need replications? its taking up nx amount of resources and if its monolith we would not have need to suffer from all the additional work to maintain or achieve CAP.
+Failures address by replication are fail-stop faults of a single computer which refers to if anything goes wrong the computer just stops executing. what is not covered by replication are like bugs or design defects of software or hardware etc. other limitations are when the failures are dependent or natural disaster recovery, replication also cant help with it. also do we really need replications? its taking up nx amount of resources and if only its monolith we would not have need to suffer from all the additional work to maintain or achieve CAP.
+
+> note fail stop might be content dependent, a scenario might be considered fail stop for a particular system and software but not for others.
 
 there are two approaches to replicas
 
@@ -22,9 +24,9 @@ a few issue to address for using replicated state machine
 - cut-over and anomalies
 - bring up a new replica when one of them fails (essentially it will be expensive as state transfer is needed)
 
-## on replicating state
+## on *replicating state (machine)*
 
-replication scheme as detailed as low level registers and memory between primary and backup is rare however it also allows it to be application agnostic, unlike replicated state machine which heavily relies on application level sync. the vmware FT paper experiment setup is to have two hardware and on each to have a VM spawn with the same os and application. the sync is through LAN with an external disk server. through interrupts, VM sync the state through log entries over the communication channel, thus backup actually executes the same command the primary was requested but the packet is dropped. in the case where the channel is not transmitting packets, the system will assume either machine is down and will operates as if its a single machine system without backup.
+replication scheme as detailed as low level registers and memory between primary and backup is rare however it also allows it to be application agnostic, unlike conventional replicated state machine which heavily relies on application level sync. the vmware FT paper experiment setup is to have two hardware and on each to have a VM spawn with the same os and application. the sync is through LAN with an external disk server. through interrupts, VM sync the state through log entries over the communication channel, thus backup actually executes the same command the primary was requested but the packet is dropped. in the case where the channel is not transmitting packets, the system will assume either machine is down and will operates as if its a single machine system without backup.
 
 ### contentious problem
 
