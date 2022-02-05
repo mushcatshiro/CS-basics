@@ -62,3 +62,22 @@ also
 on engineering
 
 > engineering is what happens when things need to live longer and influence of time starts creeping in. - Titus Winters
+
+## Building a Bank with Go
+
+[bank](https://www.youtube.com/watch?v=y2j_TB3NsRc&ab_channel=InfoQ)
+
+```go
+package context
+
+type Context interface {
+    Deadline() (deadline time.Time, ok bool)
+    Done() <- chan struct{}
+    Err() error
+    Value(key interface{}) interface{}  // copies itself thus thread-safe
+}
+```
+
+
+
+reference: [go-kit](https://github.com/go-kit/kit), [micro](https://github.com/micro/micro), [typhon](https://github.com/monzo/typhon), [linkerd service mesh](https://linkerd.io/)
