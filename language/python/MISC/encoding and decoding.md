@@ -31,3 +31,7 @@ conversion from unicode to utf-8 in short is to find the most significant bit an
 ## python 3
 
 in python encoding refers to the process of  converting unicode to bytes and decoding refers to the opposite process.
+
+## references
+
+[unicode-and-character-sets](https://www.joelonsoftware.com/2003/10/08/the-absolute-minimum-every-software-developer-absolutely-positively-must-know-about-unicode-and-character-sets-no-excuses/)
