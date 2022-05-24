@@ -18,7 +18,7 @@ class SQLGeneratorV1:
             return self
         self._validate_replace_dict(replace_dict)
         for k, v in replace_dict.items():
-            target = '{' + k + '}'  # {lot_id}
+            target = '{' + k + '}'  # {some_id}
             if isinstance(v, list):
                 replacement_string = self.sql_helper[k]['list']
                 v = ", ".join(['\'' + i + '\'' for i in v])
@@ -35,12 +35,12 @@ class SQLGeneratorV1:
                 replacement_string = replacement_string.replace(target, v)
                 self.sql_string = self.sql_string.replace(target, replacement_string)
             elif isinstance(v, str):
-                replacement_string = self.sql_helper[k]['str']  # lot_id = {lot_id}
+                replacement_string = self.sql_helper[k]['str']  # some_id = {some_id}
                 if 'LIKE' in replacement_string:
                     v = '\'%' + v + '%\''
                 else:
                     v = '\'' + v + '\''
-                replacement_string = replacement_string.replace(target, v)  # lot_id = '\ 1234567.007 \'
+                replacement_string = replacement_string.replace(target, v)  # some_id = '\ 1234567.000 \'
                 self.sql_string = self.sql_string.replace(target, replacement_string)
             elif isinstance(v, int):
                 replacement_string = self.sql_helper[k]['int']
