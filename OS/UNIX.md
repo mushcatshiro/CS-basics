@@ -4,10 +4,6 @@
 
 ## files based system
 
-
-
-____
-
 1. kernel version checking >> uname -a/-v/-r
 2. check current IP >> ifconfig /ip addr show
 3. free disk space >> df -ah
