@@ -26,7 +26,9 @@ Client->Server: TCP socket connection ESTABLISHED
 
 ### 2.2 why 3-way handshake?
 
-the third ack is not redundant to prevent lagged connection, eg. first SYN is delayed, thus client sent another SYN packet and successfully establish connection. then the first SYN is received by the server end, and attempt to establish a **new** connection thus in total we would have established two connection which is a waste of resource.
+the third ack is not redundant to prevent lagged connection, eg. first SYN is delayed, thus client sent another SYN packet and successfully establish connection. then the first SYN is received by the server end and attempt to establish a **new** connection. had there is only two handshakes required to establish connection, we would have established two connection which is a waste of resource.
+
+multi-way handshake is designed to address communication channel's unreliability for multiple parties that attempts to reach consensus and 3 is the theoretical minimum number of handshakes required. note the consensus here refers to the communication channel's reliability.
 
 ### 2.3 terminate connection (can be initiated from both ends)
 

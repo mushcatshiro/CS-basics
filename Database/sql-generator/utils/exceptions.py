@@ -1,0 +1,2 @@
+IncorrectFormatter(Exception):
+    pass
