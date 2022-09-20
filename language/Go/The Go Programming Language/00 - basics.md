@@ -507,7 +507,7 @@ func Bonus(e *Employee, factor int) {
 }
 ```
 
-comparing structs is possible with `==` and `!=`, and because its a comparable type, it is eligible to be set as key of a map type. anonymous fields and struct embeddings
+comparing structs is possible with `==` and `!=`, and because its a comparable type, it is eligible to be set as key of a map type. anonymous fields and struct embeddings. anonymous fields must be a named type or a pointer to a named type.
 
 ```go
 // explicit

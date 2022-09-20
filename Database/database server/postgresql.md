@@ -50,7 +50,7 @@ configs (hba_config)
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
 
 # IPv6 local connections:
-host    all             user_name       0.0.0.0/0               md5
+host    all             user_name       0.0.0.0/0               md5  #::1/128
 ```
 
 config (postgresql.conf)
@@ -66,6 +66,21 @@ Postgresql warning: "could not flush dirty data: Function not implemented"
 fsync = off # i didn't turn off for this
 data_sync_retry = true
 ```
+
+basic navigations
+
+```sql
+
+```
+
+check connections
+
+```sql
+SELECT *
+FROM  pg_stat_activity
+```
+
+
 
 manual: man psql
 

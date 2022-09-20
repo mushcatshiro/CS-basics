@@ -2,3 +2,8 @@
 *.db
 *.sqlite
 **/__pycache__/*
+*.log
+*.pdf
+assignments/
+*.gif
+_todo*
