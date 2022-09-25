@@ -65,7 +65,7 @@ server might have logic to handle sudden connection closure eg. processing some 
 
 ### 2.8 2MSL waiting state
 
-TIME_WAIT or 2MSL wait state (maximum segment lifetime). its the time a TCP segment can exists in the internetwork system before discarded. when TCP executes a closing operation and response with the final ACK, the connection must wait for 2MSL to prevent the final ACK package lost. if there exists no 2MSL, when the server resend FIN-ACK the connection was single sided closed on the client end thus server can't be close properly. also if the lost final ACK reappear in the network system as long as it expires the 2MSL it will be discarded.
+TIME_WAIT or 2MSL wait state (maximum segment lifetime). its the time a TCP segment can exists in the internetwork system before discarded. when TCP executes a closing operation and response with the final ACK, the connection must wait for 2MSL. if there exists no 2MSL, when the server resend FIN-ACK the connection was single sided closed on the client end thus server can't be close properly. if the same client reinitiate another TCP connection to the same port, should there be no reliable connection termination the segments might mixed out. with 2MSL, both FIN-ACK and ACK will be reliabily discarded. if the lost final ACK reappear in the network system as long as it expires the 2MSL it will be discarded.
 
 ## 3. explain TLS handshakes (SSL)
 
@@ -171,7 +171,9 @@ a simple example, by exploiting url `http://site.com/search?q=cats<script src="h
 
 to prevent XSS inputs must be sanitized, thus templating engines requires `safe` keyword when sending HTML contents and JS html sanitize libraries exists. also cookie's security is added to further mitigate XSS by tying cookie with IP address, can be potential exploited by NATed IP address/IP address fogery.
 
-## 14. sticky package
+## 14. sticky connection
+
+by having the load balancer creates affinity between client and host server during a session. this allows http(s) a "stateless" protocol to be stateful. it helps to reduce the urgency of syncying user session data and have a better used of RAM cache, however at the cost of potential less well balanced loading. duration based expiry session can help to alleviate such issues.
 
 ## 15. forward and redirect
 
@@ -216,6 +218,6 @@ mainly converts IP address to MAC address. in RFC1122 mention ARP within link la
 3. if A and B are not in the same local network, the process is similar but through a router, and within A's ARP table it stores the router that links to B instead
 4. if router that A relies has no corresponding pair, A broadcast to the router and subsequently the router broadcast to other routers so on and so forth.
 
-## IP address and MAC address
+## 20. IP address and MAC address
 
 IP address can be think of as postal address, and MAC address can be think of as the actual receipient. having both resolves the problem where within a subnet all nodes shares the same IP address. network switch is responsible for transfering frames from a MAC address to another. router identifies IP address and transmit the packet to destination IP.
