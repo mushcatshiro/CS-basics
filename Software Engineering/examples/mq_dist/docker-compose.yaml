@@ -1,0 +1,39 @@
+services:
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
+  client1:
+    image: client1
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      - CLIENTNAME=one
+      - MODE=client
+    depends_on:
+      - redis
+
+  client2:
+    image: client2
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      - CLIENTNAME=two
+      - MODE=client
+    depends_on:
+      - redis
+
+  app:
+    image: server
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    environment:
+      - MODE=app
+    depends_on:
+      - redis
+    ports:
+      - "5000:5000"
