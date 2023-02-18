@@ -14,7 +14,7 @@ as database.
 - [ ] separation of client and app
   - i.e. current commit client and app shares same project folder
   - workaround for namespace search
-- [ ] remove rq connection hardcoding
+- [x] remove rq connection hardcoding
 - [ ] endpoint for job checking
 
 ## setup
