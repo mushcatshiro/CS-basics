@@ -68,5 +68,7 @@ def bichar(target):
     if target in d:
         cnt = d[target]
         print(f"found {cnt} of {target}.")
+        return {target: cnt}
     else:
         print("target not found.")
+        return {target: 0}

@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, g
 from rq import Queue, push_connection
+from rq.job import Job
 import redis
 from bichar import bichar
 
@@ -21,8 +22,23 @@ def push_rq_connection():
 def add():
     args = request.json
     q = Queue()
-    q.enqueue(bichar, args["target"])
-    return jsonify({"response": "task added!"})
+    resp = q.enqueue(bichar, args["target"])
+    return jsonify(
+        {
+            "response": "task added!",
+            "id": resp.id,
+        }
+    )
+
+@app.route("/check", methods=["POST"])
+def check():
+    args = request.json
+    j = Job.fetch(id=args["id"])
+    return jsonify(
+        {
+            "result": j.return_value()
+        }
+    )
 
 
 if __name__ == "__main__":
