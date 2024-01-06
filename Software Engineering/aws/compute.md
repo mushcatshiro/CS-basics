@@ -182,8 +182,8 @@ metric is computed for overall ASG instance.
 - pretictive scaling
   - continuous forecast and schedule ahead
 
-In the scaling policy there is a scaling cooldown that default to  300s to
-prevent scaling after scaling process completed
+In the scaling policy there is a scaling cooldown that default to 300s to
+prevent scaling after scaling process completed/allow metric stabilization.
 
 ## MISC
 
