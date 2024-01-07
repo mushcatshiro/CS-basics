@@ -75,7 +75,7 @@ A L4 load balancer that support TCP and UDP load balancing.
 
 - extreme high performance: at million request per second
 - low latency ~100ms (vs ALB ~400ms)
-- on static IP per AZ and support elastic IP assignment
+- have static IP per AZ and support elastic IP assignment
   - good for whitelisting specific IP
   - limit application exposure to limited IPs
 - minimum 1 AZ
@@ -148,4 +148,42 @@ and CloudFront supports it.
 
 Time to complete in-flight requets while the instance is de-regestering or
 unhealthy i.e. stop sending new request to EC2. Can be set as 0~3600 seconds.
+
+## Route 53
+
+[DNS ref](../../Network/Interview%20Question.md##-16.-DNS)
+
+> 53 is the traditional DNS port
+
+High available, scalable fully managed authoritative DNS. One of AWS global
+service and only service that guarantees 100% SLA. Provides domain registrar
+service.
+
+Route 53 records stores information on how to route traffic to domain and
+contains,
+
+- domain/subdomain name
+- record type
+- value
+- routing policy i.e. how R53 respond to queries
+- TTL (record cached at DNS resolvers)
+  - mandatory except for alias records
+
+### CNAME and Alias
+
+R53 cannot create CNAME record for top node of DNS namespace (zone apex) e.g.
+can not create for `example.com` but possible for `www.example.com`
+
+### R53 Hosted Zone
+
+R53 NS records store name server for hosted zones.
+
+Container for records that define traffic routing to a domain and subdomains.
+R53 support public and private hosted zone.
+
+- public hosted zone
+  - contains records that specify traffic routing on public internet
+- private hosted zone
+  - specify traffic routing within one or more VPC (private domain names)
+
 

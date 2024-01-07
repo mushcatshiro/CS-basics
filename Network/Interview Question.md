@@ -199,6 +199,53 @@ sequenceDiagram
 
 ## 16. DNS
 
+Domain name system converts human readable domain names `example.com` into
+IP address through a hierarchical structure. A domain name registrar is a
+company that managed the reservation of internet domain name. These companies
+holds the name server records and name servers holds DNS records.
+
+DNS records are instructions that live in authoritative DNS servers and provide 
+information about a domain including what IP address is associated with that
+domain and how to handle requests for that domain. DNS records including A,
+AAAA, CNAME, NS and etc.
+
+Domain name is resolved in reversed order. `https://hostname.www.example.com`
+is first resolved at the root name server to get the top level domain name
+server for `.com` then second level domain/authoritative name server for
+`example.com` and finally obtain IP address.
+
+```
+http://api.www.example.com/ -> url
+|      |  |   |       |   |_ root (ICANN)
+|      |  |   |       |_ TLD (IANA)
+|      |  |   |_ SLD (domain registrar)
+|      |  |_ subdomain
+|      |_ FQDN
+|_ protocol
+```
+
+```mermaid
+sequenceDiagram
+    client->>local DNS: http://www.example.com/
+    local DNS->>root DNS name server: .com
+    root DNS name server->>local DNS: .com's top level DNS server IP?
+    local DNS->>top level DNS server: example.com
+    top level DNS server->>local DNS: example.com's second level DNS server IP?
+    local DNS->>second level DNS: example.com
+    second level DNS->>local DNS: 1.1.1.1
+    local DNS->>local DNS: cache
+    local DNS->>client: 1.1.1.1
+```
+
+> local DNS is usually the internet service provider
+
+### Record Types
+
+- A record: maps domain name to IPv4
+- AAAA record: maps domain name to IPv6
+- CNAME: maps domain name to domain name that has A or AAAA record
+- NS: maps domain name to authoritative DNS server that contains actual DNS records
+
 ## 17. Browser
 
 1. resolve URL's domain name into IP address using DNS

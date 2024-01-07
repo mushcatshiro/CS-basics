@@ -24,7 +24,7 @@ snapshot with no latency on first use/creation forcefully.
 | gp2 burst 3000 | size and IOPS linked | max 16,000 IOPS (5334 GB); 3 IOPS per GB |
 | gp3 | | 3000 - 16,000 IOPS & 125 - 1000 MB/s throughput (independent setting) |
 | io1/io2 (ssd) | high performance SSD, low latency, high throughput | see PIOPS | | 4 - 64 TB |
-| PIOPS io2 | better durability than io1| > 16,000; max 64,000 for EC2 Nitro and 32,000 for the rest; independent of size |
+| PIOPS io2 | better durability than io1 | max 64,000 IOPS for EC2 Nitro and 32,000 for the rest; independent of size |
 | PIOPS io2 block express | submilisecond latency | max 256,000 with IOPS:GB 1000:1 | support multi-attach EBS |
 | st1 (hdd) | low cost, frequent access, high throughput | max 500 MB/s & 500 IOPS | data warehouse, logging | 125 GB - 16 TB |
 | sc1 (hdd) | lowest cost, infrequent access | max 250 MB/s & 250 IOPS | archive | 125 GB - 16 TB |
