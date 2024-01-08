@@ -167,7 +167,7 @@ contains,
 - value
 - routing policy i.e. how R53 respond to queries
 - TTL (record cached at DNS resolvers)
-  - mandatory except for alias records
+  - mandatory except for alias records which is set by AWS R53
 
 ### CNAME and Alias
 
@@ -186,4 +186,97 @@ R53 support public and private hosted zone.
 - private hosted zone
   - specify traffic routing within one or more VPC (private domain names)
 
+### CNAME vs alias
 
+AWS resources are exposed as hostname e.g.
+`ip-1-31-25-2.ap-southeast-1.compute.amazonaws.com`. CNAME only maps non-root
+domain to another thus it can not be mapped to `example.com`. However alias
+can map any hostname to AWS resource (root or non-root). R53 provides this for
+free and having a native health check.
+
+R53 alias record is an extention to the DNS functionality. When tied to ALB, if
+the IP address changes, it will be recognized (?). It can be used for top node
+of DNS namespace (zone apex). alias record is always A/AAAA record for AWS
+resource.
+
+Common AWS resource using R53
+
+- ELB
+- CloudFront distribution
+- Api geteway
+- S3 websites
+- BeanStalk
+- Global Accelerator
+- VPC endpoints
+- R53 record in the same hosted zone
+
+> note alias record cannot be set for ec2 DNS
+
+### Health Checks
+
+Health checks are done mainly for public resources i.e. AWS ping from internet.
+These health checks are for automated DNS failover by,
+
+- monitoring the endpoint (application, server, other AWS resource)
+- calculated health checks (other health checks)
+- health check on CloudWatch Alarm (helpful for private resources)
+
+Endpoint monitoring is from ~15 global health checkers at interval of 30 sec
+(or higher with higher cost) and supports HTTP(S)/TCP. If > 18% deems healthy,
+it is considered healthy. If the payload is too huge, only first 5120 byte data
+is used for content check. Must be enabled.
+
+Calculated health check combine multiple health check into one with `AND`, `OR`
+and `NOT` logic up to 256 health check. Possible to setup % pass for overall
+pass.
+
+CloudWatch Alarm option is done through setting CloudWatch Metric associated
+with CloudWatch Alarm and then create a health check that checks on the alarm
+itself.
+
+### Routing Policy
+
+> note that routing means how R53 response to queries but no actual routing
+
+Simple routing routes to single resource. If multiple values are specified, all
+will be returned and client will choose one. When alias is enabled, only one
+AWS resouce can be specified as target. This can not be associated to health
+check.
+
+Weighted allows to set a percentage to each resource with single 0 as disable
+and all 0 implying equal weight. Health checks are possible and weight can be
+updated dynamically for load balancing or A/B testing. The records must be of
+same record name name and record type.
+
+Latency allows to route resource with lowest latency based on latency between
+user and AWS region. Support health checks and failover. The records must be of
+same record name name and record type.
+
+Failover is similar to the above ones, same record name and type associated
+to health check. The difference is that it is meant for active-passive
+failover. Unless the primary is unhealthy, all traffic will always be routed to
+primary.
+
+Geolocation is based on user location i.e. by continent, country etc. (if there
+is an overlap then use the most precise option). Requires a default and
+supports health check.
+
+Geoproximity route based on the resource and user location. Can shift traffic 
+to resouce based on bias i.e. AWS region or longitude/lattitude for on prem.
+Positie bias value routes more traffic to resource; Negative bias value route
+less traffic to resource. R53 traffic flow must be enabled to use this feature.
+
+IP route policy is based on client ip by providing a list of CIDR of clients
+and the corresponding endpoint. This targets to optimize performance and reduce
+network cost i.e. route end user of certain ISP to a specific endpoint.
+
+Multi-value route policy is for routing traffic to multiple resources by
+returning multiple values that can be associated with health checks (only
+returns health resources). Up to 8 healthy records is returned and is not an
+substitude for ELB. The records must be of same record name name and record
+type.
+
+AWS allows user to use R53 or other DNS record management service for 3rd party
+domain name. If domain is bought on 3rd party registrar and intend to use R53
+as DNS service provider. Create a hosted zone in R53 and update NS records on
+3rd party website to use R53 name servers.

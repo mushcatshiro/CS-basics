@@ -43,7 +43,7 @@ replica is used as failover **????
 
 It is possible for RDS to be promoted from single AZ to multi AZ with no
 downtime by modifying the database option. RDS will take a snapshot of database
-and reestore it in a new AZ and run a sync between two instance.
+and restore it in a new AZ and run a sync between two instance.
 
 #### RDS Proxy
 

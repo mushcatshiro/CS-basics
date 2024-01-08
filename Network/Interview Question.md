@@ -244,7 +244,13 @@ sequenceDiagram
 - A record: maps domain name to IPv4
 - AAAA record: maps domain name to IPv6
 - CNAME: maps domain name to domain name that has A or AAAA record
-- NS: maps domain name to authoritative DNS server that contains actual DNS records
+- NS: maps domain name to authoritative DNS server that contains actual DNS records (no CNAME)
+
+> https://simpledns.plus/lookup-dg
+
+> for mushcatshiro.com DNS, check root server for `.com` then get referral to
+> generic TLD server. gTLD server response to DNS server for `mushcatshiro.com`
+> authoritative DNS response to A record of `mushcatshiro.com`.
 
 ## 17. Browser
 
