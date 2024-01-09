@@ -98,6 +98,94 @@ emphemeral. It is usually used in buffer, cache, temporary/scratch file
 scenario. Note that there is a risk for data loss should there be a hardware
 failure.
 
+## Simple Storage Service (S3)
+
+S3 is an infinitely scaling storage for backup/archive and object level
+storage. It can be used as
+
+- disaster recovery
+- hybrid cloud storage
+- application/static site/media hosting
+- big data storage and analytics
+- software delivery (patches)
+
+S3 although is presented like a directory/file system, however is more like a
+key value store from the underlying infrastructure perspective. All buckets
+must have a globally unique name - across all region all accounts. Buckets
+are bounded at region level despite looking like a global service. Objects in
+S3 has a size limit of 5TB and its recommended when uploading a file larger
+than 5GB to use multi-part upload. Each object has,
+
+- metadata (list of kv pair for system and user metadata)
+- tags (kv pair, up to 10, usually for security and lifecycle management)
+- version ID (if enabled)
+  - versioning is enabled at bucket level
+  - mainly used to prevent unintended delete and version control (roll back)
+  - files prior to versioning enabled will have version null
+  - suspeding versioning will not delete pervious version
+
+S3 bucket replication allows for both cross- and same- region replication
+through setting replication rule. Versioning must be enabled in both source
+and destination region. The buckets can be in different AWS accounts and the
+replication is done asynchronously. IAM permission must be set correctly to
+start replication.
+
+Some use case for the two replication mode,
+
+- CRR: compliance, low latency access, replication cross account
+- SRR: log aggregation, live replication between test and prod environment
+
+When deleting an object with no version specified, a delete marker is attached.
+However when deleting an object with version specified, that particular version
+object is deleted. Delete marker is not replicated by default and deletion are
+not replicated to avoid malicious delete. If a delete request has version
+specified, S3 does not replicate delete from source bucket.
+
+S3 replication will not be chained i.e. object created in first bucket will
+only be replicated to second bucket and not the third bucket despite second
+bucket is set to replicate objects to the third bucket.
+
+> note that only new object after replication enabled is replicated. for object
+> that exists or failed during replication in bucket requires manual batch
+
+### Storage Classes
+
+S3 storage can move between classes manuall or through lifecycle config. All
+S3 storage classes has 11 9s durability across multiple AZ. The difference
+between classes is the availability.
+
+| class | availability | use case |
+|-|-|-|
+| general purpose | 99.99% | frequently accessed data, low latency high throughput able to sustain 2 facility failure |
+| infrequenct access | 99.9% | less frequent access and rapid access when needed, lower cost, usually for disaster recovery |
+| S3 inteligent tiering | - | move between tier based on usage, charged monthly for monitoring and auto tiering, no retrieval charge |
+| one zone IA | 99.5% | hugh durability in one AZ, data is lost if AZ destroyed, secondary backup for on prem data |
+| glacier instant retrieval | - | milisecond retrieval, minimum 90 days storage, data accessed per quarter |
+| glacier flexible retrieval | - | expedited 1-5mins; standard 3-5hours, bulk 5-12hours, min storage 90 days, data access yearly |
+| glacier deep archieve | - | standard 12 hours; bulk 48 hours; min 180 days storage, long term storage |
+
+### S3 Security
+
+By default S3 data is encrypted with SSE-S3 (S3 managed keys). Alternatively,
+user can use SSE-KMS or SSE-C options for server side encryptions. Client side
+encryption is also possible but has to be managed at client side.
+
+User based control is done through IAM and roles. resource based policy can be
+setup such that it applies bucket wide (known as S3 bucket policy), object ACL
+for fine grain control and bucket ACL (less commonly used). When multiple rules
+exists, it will first ensure that IAM permission or resource based policy
+allows, while also ensuring there is no explicit deny.
+
+With the policies above, it is possible to grant public access, or force object
+to be encrypted at upload, or grant access to another account (cross account).
+
+
+> naming convention including only lowercase, no underscore, 3-63 characters
+> long, not an IP, start with alphanum, must not start with xn- prefix and
+> -s3alias suffix.
+
+S3 is encrypted with 
+
 ## MISC
 
 throughput vs IOPS

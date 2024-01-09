@@ -99,6 +99,12 @@ balancing, scaling, health monitoring, instance configuration etc. Develop will
 only need to focus on application code. The orchestration is still
 configurable.
 
+It uses managed containers that supports mainstream programming language
+environment e.g. java, js, py and docker etc. on known web server e.g. tomcat,
+nginx, httpd and etc. Once deployed, develoer can still replace part of system
+as they like it. Think it as having infrastructure managed through tested
+system configuration template.
+
 There is two deployment mode, single instance for developmet (with elastic IP)
 and high availability with load balancer for prod.
 
