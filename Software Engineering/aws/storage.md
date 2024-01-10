@@ -148,6 +148,54 @@ bucket is set to replicate objects to the third bucket.
 > note that only new object after replication enabled is replicated. for object
 > that exists or failed during replication in bucket requires manual batch
 
+S3 has a requester pay option such that the object's requestor (AWS
+authenticated) pays for the network transfer.
+
+S3 events can be used for automation (simple filtering is allowed). Events
+created can be linked to other services and expect delays (seconds - minutes).
+Appropriate IAM permission must be granted on downstream services including
+lambda, SNS and SQS. S3 events can be limited (downstream service and
+filtering), thus using EventBridge might be an alternative.
+
+S3 batch operation allows bulk operation to be performed on existing S3 objects
+with single request,
+
+- modify object metadata/properties/ACL/tags
+- copy between buckets
+- encrypt unencrypted objects
+- restore objects from S3 Glacier
+- invoke lambda funtion to perform custom action on each object
+
+A batch operation consist of a list of objects, action and optional parameters.
+S3 batch operation is highly managed, it retries, tracks progress, sends
+completion notification, generates report and etc. Batch operation can be used
+together with S3 inventory to get object list and S3 select to filter objects.
+
+### S3 Performance
+
+> bucket/folder/subfolder/file name, prefix is anything between bucket and file
+> name
+
+- scales to high request rate with latency ~200ms
+- at least 3,500 put/delete/copy/post per second per perfix
+- at least 5,500 get/head request per second per perfix
+- no limit to number of prefix in bucket
+
+A few tips on S3 performance optimization including
+
+- multipart upload: parallel upload to speed up
+  - recommend for files > 100MB
+  - must use for file > 5GB
+- S3 transfer acceleration
+  - improve speed by xfering to AWS edge location and forward data to S3 bucket in target region
+- byte range fetch: speed up download or retrieve only specific data
+  - parallel get for specific byte range
+  - resilient to failures
+
+S3 Select/Glacier Select is means to retrieve object with SQL queries. Server
+side filtering is done to improve network cost. The selection can be done on
+rows and columns.
+
 ### Storage Classes
 
 S3 storage can move between classes manuall or through lifecycle config. All
@@ -164,11 +212,51 @@ between classes is the availability.
 | glacier flexible retrieval | - | expedited 1-5mins; standard 3-5hours, bulk 5-12hours, min storage 90 days, data access yearly |
 | glacier deep archieve | - | standard 12 hours; bulk 48 hours; min 180 days storage, long term storage |
 
+Lifecycle rules can be setup to move object between storage tiers. There are
+two types of actions,
+
+- transition action: move object from class A to class B after X days (entire objec)
+- expiration action: delete object after X days 
+  - only current version
+  - to delete old version of files if versioning enabled
+  - delete incomplete multipart upload
+
+Rules can be created for certain prefix of S3 bucket name or tags
+
+Storage class analysis can be done in S3 analytics to decide when to transition
+object to right storage class. Only for standard and standard IA. It is updated
+daily and need to wait 24-48 hours for first analysis.
+
 ### S3 Security
 
 By default S3 data is encrypted with SSE-S3 (S3 managed keys). Alternatively,
-user can use SSE-KMS or SSE-C options for server side encryptions. Client side
-encryption is also possible but has to be managed at client side.
+user can use SSE-KMS or SSE-C (customer provided key) options for server side
+encryptions. Client side encryption is also possible but has to be managed at
+client side.
+
+- SSE-S3
+  - AWS256 encrypted
+  - request must have header "x-amz-server-side-encryption": "AES256"
+- SSE-KMS
+  - under controlled key (stored in AWS)
+  - integration with CloudTrail for key usage
+  - header "x-amz-server-side-encryption": "aws:kms"
+  - accessing object requires key
+  - limited by KMS generate key/decrypt and counts towards KMS quota
+- SSE-C
+  - key is stored at client end and is sent together to AWS for encryption
+  - AWS do not store the key thus every request requires key provided
+  - HTTPS is required
+- DSSE-KMS
+  - double encryption option with KMS
+
+> for SSE-KMS and SSE-C it is possible to add additional bucket policy to
+> enforce encryption.
+
+For in flight security, S3 has an option to enforce encryption by including
+bucket policy "secured transport". Note the policy is evaluated before
+encryption. S3 CORS can be enabled for some defined host in case cross origin
+request is expected to hit on S3 buckets.
 
 User based control is done through IAM and roles. resource based policy can be
 setup such that it applies bucket wide (known as S3 bucket policy), object ACL
@@ -179,12 +267,67 @@ allows, while also ensuring there is no explicit deny.
 With the policies above, it is possible to grant public access, or force object
 to be encrypted at upload, or grant access to another account (cross account).
 
-
 > naming convention including only lowercase, no underscore, 3-63 characters
 > long, not an IP, start with alphanum, must not start with xn- prefix and
 > -s3alias suffix.
 
-S3 is encrypted with 
+ S3 has an option to enable MFA delete for permanently deleting an object
+ version or suspending versioning on a bucket. List deleted version/enable
+ versioning does not require MFA. Versioning must first be enabled before MFA
+ delete is enabled and enablement requires bucket owner (root account).
+
+ S3 access logs can be enabled for audit purposes. All incoming request will be
+ logged into another S3 bucket in the same region. Infinite loop is be created
+ if the monitored bucket is set as the logging bucket.
+
+ S3 can generate pre-signed urls such that the IAM permission is shared to
+ another user with the url (with exipry). A few use cases including
+
+ - sharing/upload some files without changing bucket to public
+ - ever changing user list
+ - premium media download
+
+ S3 access point can help to simplify security management for S3 buckets. It
+ masks off the buckets and only user through any access point to access a
+ subset of buckets. Each access point has a DNS name (internet or VPC origin).
+ Access point is controlled by access point policy.
+
+ For VPC origin access point, a VPC endpoint must be created to access with
+ VPC endpoint policy allow access to target bucket and access point.
+
+### S3 Locks
+
+Glacier has an glacier vault lock option adopts a Write Once Read Many model by
+creating a vault lock policy. The vault lock prevents object from future edits
+and it is helpful for compliance and data retention.
+
+A similar option is available for no glacier S3 known as S3 object lock which
+blocks object deletion for specified amount of time and requires versioning.
+There are two modes,
+
+- retention mode compliance
+  - object version can not be overwritten or deleted including root user
+  - object retention mode and retention period can not be changed 
+- retention mode governance
+  - most users can not overwrite or delete object version or alter lock settings
+
+Retention period must be set for both modes and can be extended. There is also
+legal hold option that protect object (version) indefinitely and is independent
+from retention period. IAM permission is required to place and remove legal
+hold.
+
+### S3 Object Lambda
+
+Using lambda to modify object just before caller retrieve the object. Access
+point and S3 object lambda access point is required. The retrieval path would
+be S3, S3 access point, lambda function, lambda function access point and
+client.
+
+Use cases
+
+- masking personal identifiable information
+- converting file formats
+- resizing images on the fly
 
 ## MISC
 
