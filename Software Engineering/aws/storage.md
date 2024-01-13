@@ -329,6 +329,73 @@ Use cases
 - converting file formats
 - resizing images on the fly
 
+## AWS Snow Family
+
+Is a suite of services that allows data processing at edge or moving PB of data
+to and from AWS through highly secure and portable device. It mainly addresses
+situation where connectivity or bandwidth is limited and optimize the cost
+of transfer. Generally it is used when the data transfer takes more than one
+week.
+
+- snowcone/snowball: migrate/process data at edge (EC2/lambda)
+- snow mobile: migrate data
+
+The usage process for data migration would be the following,
+
+- snow family device request from AWS
+- install snowball client/AWS OpsHub on server
+- connect snowball to server and copy files using client
+- ship back the device
+- data loaded to S3 bucket
+- snowball is completely wiped
+
+Edge computing with snow family devices are for use cases when there is limited
+internet or power supply and
+
+- data preprocessing
+- ML at edge
+- media stream transcoding
+
+and etc. are needed. The data can be send back to AWS (optional). The lambda
+function is using AWS IoT Greengrass service. Long term deployment options for
+1 and 3 years are at discounted pricing.
+
+### Snowball Edge
+
+Moving TB/PB data in or out of AWS. Its a pay per data transfer job service.
+The device provides block storage and S3 compatible object storage.
+
+- storage optimized: 80TB HDD
+  - Up to 40vCPU, 80GB RAM
+- compute optimized: 42TB HDD/28 TB NVMe
+  - 104 vCPU, 416GB RAM, optional GPU
+  - storage clustering up to 16 nodes
+
+There is no direct pipeline for snowball to glacier however it can be done by
+using lifecycle policy on the S3 bucket.
+
+### Snowcone (SSD)
+
+Small, portable, durable and secure computing device. Use when snowball does
+not fit due to space constraint. Power supplied must be prepared. Data can be
+transfered through physical transfer or through AWS DataSync.
+
+- snowcone: 8TB HDD
+- snowcone SSD: 14TB SSD
+
+Snowcone devices has 2 CPUs, 4GB RAM, wired and wireless access and using USB-C
+or optional battery for power supply.
+
+### Snowmobile
+
+Exabyte-level of data transfer (1000PB), 100PB per truck. It is highly secured,
+temperature controlled, GPS, 24/7 video surveillance etc.
+
+### AWS OpsHub
+
+AWS OpsHub is an alternative for using snow family devices through CLI that can
+be installed on local machine.
+
 ## MISC
 
 throughput vs IOPS
