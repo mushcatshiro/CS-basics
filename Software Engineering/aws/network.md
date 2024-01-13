@@ -169,11 +169,6 @@ contains,
 - TTL (record cached at DNS resolvers)
   - mandatory except for alias records which is set by AWS R53
 
-### CNAME and Alias
-
-R53 cannot create CNAME record for top node of DNS namespace (zone apex) e.g.
-can not create for `example.com` but possible for `www.example.com`
-
 ### R53 Hosted Zone
 
 R53 NS records store name server for hosted zones.
@@ -188,7 +183,9 @@ R53 support public and private hosted zone.
 
 ### CNAME vs alias
 
-AWS resources are exposed as hostname e.g.
+R53 cannot create CNAME record for top node of DNS namespace (zone apex) e.g.
+can not create for `example.com` but possible for `www.example.com`. AWS
+resources are exposed as hostname e.g.
 `ip-1-31-25-2.ap-southeast-1.compute.amazonaws.com`. CNAME only maps non-root
 domain to another thus it can not be mapped to `example.com`. However alias
 can map any hostname to AWS resource (root or non-root). R53 provides this for

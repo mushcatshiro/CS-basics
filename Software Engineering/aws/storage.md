@@ -157,6 +157,8 @@ Appropriate IAM permission must be granted on downstream services including
 lambda, SNS and SQS. S3 events can be limited (downstream service and
 filtering), thus using EventBridge might be an alternative.
 
+> S3 events can only have one event rule per perfix, use SNS to circumvent it
+
 S3 batch operation allows bulk operation to be performed on existing S3 objects
 with single request,
 
