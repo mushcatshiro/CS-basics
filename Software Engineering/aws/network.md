@@ -280,3 +280,87 @@ AWS allows user to use R53 or other DNS record management service for 3rd party
 domain name. If domain is bought on 3rd party registrar and intend to use R53
 as DNS service provider. Create a hosted zone in R53 and update NS records on
 3rd party website to use R53 name servers.
+
+## CloudFront (CDN)
+
+CloudFront is primarily used as a cache for web content at edge (AWS point of
+prescence) to improve read performance. CloudFront also provides DDoS
+protection, AWS Shield and Web FireWall (WAF) integration. There are two
+possible origins,
+
+- S3
+  - provides enhanced security through Origin Access Control for ingress to S3 (uploads)
+  - provides TTL + cache + AWS POPs
+  - (vs S3 CRR) does not require setup for each region and not limited to read only capability
+- custom HTTP
+  - ALB/EC2/S3 website
+  - ALB/EC2 needs to be public for CloudFront as it has no VPC capability
+  - ALB/EC2 security group must allow all edge POPs to access
+
+Geo restriction is possible with CloudFront to have a allow/block list of
+countries to serve content. Countries are determined by 3rd party geo IP
+database. Usually geo restriction is meant for copyright laws compliance.
+
+CloudFront cache invalidation by default will only update the content when TTL
+expires, however it is possible to force a full or partial (i.e. special path)
+cache refresh with CloudFront invalidation.
+
+### Pricing Model
+
+Cost per edge location varies i.e. some locations are cheaper than others.
+Reducing number of edge locations helps to optimize cost.
+
+- price class All: best performance
+- price class 200: most location covered excluding the most expensive regions
+- price class 100: only least expensive regions
+
+## AWS Global Accelerator
+
+Addressed situation where application is deployed in a single region but would
+like to be accessed globally. If users accessed through public internet, it
+will cause significant latency as it takes many hops to reach the VPC. This is
+done through using Anycast IP.
+
+- unicast IP: one server holds one IP address
+- anycast IP: all server hold same IP address and client is routed to nearest one
+
+AWS global accelerator creates 2 Anycast IP for the application and leverages
+on AWS internal network (from edge location) to route to the assigned endpoint.
+
+```mermaid
+graph LR
+  c[client] ---> a[Anycast IP]
+  a ---> e[edge location]
+  e -- aws internal network ---> endpoint
+```
+
+AWS global accelerator has consistent performance by having lowest latency
+routing and fast regional failover. It works with client cache as the 2 anycast
+IP does not change. It terminates connection from client at edge location and
+establish new connection with the endpoints for faster response time and
+latency.
+
+AWS global accelerator does health checks and redirect traffic to another
+available endpoint in the endpoint group when the active endpoint is determined
+unhealthy.
+
+AWS global accelerator works with the endpoints below
+
+- elastic IP
+- EC2
+- ALB/NLB
+- public/private
+
+### VS CloudFront
+
+| feature | CloudFront | Global Accelerator |
+|-|-|-|
+| AWS global network and edge location | Y | Y |
+| AWS Shield for DDoS protection | Y | Y |
+| cache content performance improve | Y | N |
+| dynamic content (API acceleration/dynamic site delivery) performance improve | Y | N |
+| serve content at edge | Y | N |
+| improve performance over TCP/UDP | N | Y |
+| proxy packet at edge to one or more AWS region | N | Y |
+| gaming (UDP)/IOT (MQTT)/VOIP | N | Y |
+| HTTP use cases that requires static IP | N | Y |
