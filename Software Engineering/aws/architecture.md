@@ -117,3 +117,43 @@ BeanStalk is made up of 3 components,
   - tiers (web/worker)
 
 BeanStalk deployment is done by CloudFormation.
+
+## ECS
+
+With EventBridge, fully serverless architecture for image processing.
+
+Event based
+
+```mermaid
+graph LR
+  client -- upload ---> S3
+  S3 -- event ---> aeb[EventBridge]
+  aeb -- run task ---> et[ECS task]
+  et <-- get from S3 --> S3
+  et -- save to ---> DDB
+```
+
+or schedule based
+
+```mermaid
+graph LR
+  aeb[EventBridge] -- scheduled run task ---> et[ECS task]
+  et -- save to ---> S3
+```
+
+With SQS
+
+```mermaid
+graph LR
+  msg ---> sqs
+  sqs -- poll for message ---> et[ECS task]
+```
+
+Combining both SNS and EventBridge
+
+```mermaid
+graph LR
+  ecs[ECS cluster] -- task exited ---> eb[EventBridge]
+  eb ---> SNS
+  SNS -- email --> admin
+```
