@@ -396,6 +396,119 @@ temperature controlled, GPS, 24/7 video surveillance etc.
 AWS OpsHub is an alternative for using snow family devices through CLI that can
 be installed on local machine.
 
+## AWS FSx
+
+[choosing fsx](https://aws.amazon.com/fsx/when-to-choose-fsx/)
+
+FSx is a service to launch fully managed 3rd party filessystem on AWS. FSx only
+supports lustre, Netapp ONTAP, Windows File Server and OpenZFS.
+
+FSx for Windows supports,
+
+- SMB protocol and Windows NTFS
+- msft Active Directory, ACL, user quotas
+- can be mounted to Linux EC2 instance
+- supports msft distributed file system namespace for groupping files across multiple FS (on prem and on AWS)
+- scales to tens of GB/s, millions of IOPS, hundreds PB of data
+- storage option
+  - SSD
+  - HDD
+- can be accessed from on prem infrastructure through VPN or Direct Connect
+- can be configured as Multi-AZ for high availability
+- daily backup to S3
+
+FSx for Lustre
+
+- parallel distributed file system for large-scale computing (ML/HPC)
+  - video processing, financial modeling, Electronic Design Automation
+- scales to hundreds of GB/s, millions of IOPS, sub-ms latencies
+- storage option
+  - SSD: low-latency, IOPS intensive, small and random file operation
+  - HDD: throughput intensive, large and sequential file operation
+- seamless integration with S3
+  - can read fromm and write to S3 as file system through FSx
+- can be accessed from on prem infra
+- deployment option
+  - scratch file system
+    - temporary file storage
+    - data is not replicated (does not persiste if file server fails)
+    - high burst (6x faster)
+    - short term processing/cost optimization
+  - persistent file system
+    - long term storage
+    - data is replicated within same AZ
+    - replace failed files within minutes
+    - long term processing/sensitive data
+
+```mermaid
+graph LR
+  subgraph AZ1
+    c1[compute instance] <--> ENI
+    ENI ---> f[FSx for lustre]
+  end
+  subgraph AZ2
+    c2[compute instance] <--> ENI
+  end 
+  f <--> S["S3 bucket (optional)"]
+
+```
+
+> only difference is if its persistent, it has replication in same AZ
+
+NetApp ONTAP
+
+- file system compatible with NFS, SMB, iSCSI protocol
+- move work load on ONTAP or NAS to AWS
+- works with linux/win/MacOS/VMware cloud on AWS/Amazon workspace & AppStream 2.0/EC2, ECS and EKS
+- storage shrink and grows automatically
+- snapshot, replication, low-cost, compression and data deduplication
+- PITR instantaneous cloning (helpful for testing new workloads)
+
+OpenZFS
+
+- only compatible with NFS (v3, v4, v4.1, v4.2)
+- move workload on ZFS to AWS
+- same compatibility list as NetApp ONTAP
+- up to 1Mil IOPS with < 0.5ms latency
+- snapshot, replication, low-cost
+- PITR instantaneous cloning
+
+## AWS Storage Gateway
+
+A bridge between on prem data and cloud data for disaster recovery, backup &
+restore, tiered storage, on prem cache and low latency file access. There is an
+option to get hardware appliance for the gateways from AWS.
+
+S3 file GW caches the most trecently used data at the file GW. Bucket access
+uses IAM roles for each file GW. SMB protocol has integration with Active
+Directory for user authentication.
+
+```mermaid
+graph LR
+  subgraph "on prem"
+    a[app server] -- NFS or SMB ---> s[S3 file gateway]
+  end
+  s -- HTTPS ---> s3
+  subgraph "AWS cloud"
+  s3[non glacier s3 bucket] -- lifecycle policy ---> s3g[s3 glacier]
+  end
+```
+
+FSx file GW allows native access to AWS FSx for windows file server and caches
+frequently accessed data. It has native windows compatibility (SMB, NTFS, AD).
+AWS FSx works without the gateway however does not caches data. Its useful for
+group file share and home directories.
+
+Volume GW is a block storage using iSCSI protocol backed by S3 and is further
+backed by EBS snapshots for quick restore.
+
+- cached volume: low latency access to most recent data
+- stored volume: dataset on prem and scheduled backups to S3
+
+Tape GW for physical tape backup process to be backup on cloud using Virtual
+Tap Library backed by AWS S3 and Glacier. Backup data is using existing tape
+based process and iSCSI interface.
+
 ## MISC
 
 throughput vs IOPS
