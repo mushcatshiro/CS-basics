@@ -509,6 +509,40 @@ Tape GW for physical tape backup process to be backup on cloud using Virtual
 Tap Library backed by AWS S3 and Glacier. Backup data is using existing tape
 based process and iSCSI interface.
 
+## AWS Transfer Family
+
+Fully managed service for file transfer in and out of S3 and EFS using FTP
+protocol (including FTP, SFTP, FTPS). The infrastructure is managed by AWS, and
+its scalable, reliable and HA across multi-AZ. Pay per provisioned endpoint per
+hour and data transfer in GB. It is possible to store and manage user's
+credentials within the service and it integrates with existing authentication
+systems (msft AD, LDAP, Amazon Cognito, custom). Uses cases including sharing
+files, public datasets, CRM and ERP.
+
+```mermaid
+graph LR
+  u[FTP users] ---> r["R53 (optional)"]
+  r ---> a[AWS transfer family]
+  a <-- Auth ---> auth[auth service]
+  a -- IAM role ---> S3
+  a -- IAM role ---> EFS
+```
+
+## DataSync
+
+Scheduled data moving/replication task between
+
+- on prem - AWS (require agent)
+- AWS - AWS
+
+to destination including S3 (any tier including glacier), EFS, FSx on hourly,
+daily or weekly basis. The file permission metadata are preserved (NFS POSIX,
+SMB etc). One agent can use 10GB/s and a bandwidth limit can be set to ensure
+there is bandwidth for other operations.
+
+> when there is insufficient network capacity for DataSync, snowcone can be
+> used.
+
 ## MISC
 
 throughput vs IOPS
