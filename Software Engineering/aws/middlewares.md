@@ -166,4 +166,6 @@ SNS/SQS are proprietary cloud native protocol from AWS. Open source protocols
 e.g. MQTT, AMQP, STOMP, Openwire and WSS can use Amazon MQ instead without
 re-engineering the applications. It is a managed message broker for RabbitMQ
 and ActiveMQ. The scalability is not as good as SQS/SNS however is still
-possible to run in multi-AZ with failover. Offers queue and topic feature.
+possible to run in multi-AZ with failover. The failover is done through having
+an active and a standby MQ that both mounted to same EFS storage. Offers queue
+and topic feature.
