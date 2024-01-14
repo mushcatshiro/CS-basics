@@ -126,7 +126,7 @@ is allowed on outbound/inbound.
 - spread: spread instances across underlying hardware (max 7 per AZ) for HA
 - partition: spread instances across many partitions (racks) within AZ, up to hundreds of EC2 per group and up to 7 partion in AZ
 
-# Amazon Machine Image (AMI)
+## Amazon Machine Image (AMI)
 
 Customized EC2 instance including software, OS, config, monitoring etc. for
 fast boot/config time through prepackaging. AMI are bounded by region, and can
@@ -185,6 +185,145 @@ metric is computed for overall ASG instance.
 In the scaling policy there is a scaling cooldown that default to 300s to
 prevent scaling after scaling process completed/allow metric stabilization.
 
+## AWS Lambda
+
+A virtual, short executed (up to 15min) function that bills per call duration
+and runs on demand. Scaling of the function is fully managed and well
+integrated with lots of AWS services, many programming languages. It comes
+with CloudWatch monitoring and it is possible to get more resource per
+function. When one aspect of the resource increase e.g. RAM, CPU and network
+will be improved at the same time.
+
+Lambda supports a wide range of language and if there is no AWS support e.g.
+Rust, there is a open sourced custom runtime api option. Also lambda container
+image is supported as long as the container image implements the lambda
+runtime api. If it is a arbitrary Docker image, ECS/Fargate is preferred to run
+it instead.
+
+Event triggered job
+
+```mermaid
+graph LR
+  S3 -- new image added ---> lambda
+  lambda -- compress ---> s[S3]
+  lambda -- update metadata ---> DDB
+```
+
+Serverless CRON job
+
+```mermaid
+graph LR
+  cw[CloudWatch EventBridge] -- every 1 hour ---> lambda
+```
+
+Pricing is based on per calls and per duration.
+
+- first 1Mil request are free
+- $0.2 per 1Mil request thereafter
+
+- 400,000GBs free
+  - i.e. 400,000s if function requires 1GB RAM
+  - or 3,200,000s if function requires 128MB RAM
+- $1 per 600,000GBs
+
+### lambda limitation
+
+Lambda is region bounded service with some limitation with its execution and
+deployment.
+
+Execution
+
+- memory allocation between 100MB - 10GB in 1MB increments
+- maximum execution time of 15min
+- 4kb of environment variables
+- disk capacity in `/tmp` is 512MB - 10GB (for dependencies and etc)
+- concurrency execution: 1000 (can be increased)
+
+Deployment
+
+- lambda function size (compressed .zip): 50MB
+- lambda function size (uncompressed): 250MB
+
+Lambda is launched in AWS VPC and cannot access the developers VPC. To get
+access to private VPC, first enabled when creating function and specify the
+VPC ID, subnet and security group. An ENI is created in subnet for the function
+to access to resource within it.
+
+Specifically for RDS, RDS proxy can be used to allow lambda connections and
+address connection issue with there is a surge of lambda function. Lambda
+function in this case must be launched within the same VPC as RDS proxy as it
+is never publicly available. [1]
+
+### Lambda SnapStart
+
+Option to improve Java 11 and above performance by 10x with no extra cost. It
+is achieved by using Java AOT.
+
+```mermaid
+graph LR
+  code -- snapstart enabled ---> l1[lambda preinitialized]
+  l1 ---> i1[invoke]
+  i1 ---> s1[shutdown]
+  code -- snapstart disabled ---> l2[lambda]
+  l2 ---> i2[initialize]
+  i2 ---> ii2[invoke]
+  ii2 ---> s2[shutdown]
+```
+
+## Edge Function
+
+Modern application might executes some logic at edge and this can be done with
+Lambda@Edge and CloudFront function.  Executing code at edge ensure that it
+runs close to the users and minimize latency. 
+
+A few use case would be,
+
+- modifying the content on the fly
+- website security and privacy
+- dynamic web app at the edge
+- SEO
+- across origin/data center routing
+- bot mitigation at edge
+- real time image transformation
+- a/b testing
+- user authentication and authorization
+- user prioritization
+- user tracking and analytics
+
+CloudFront Function
+
+```mermaid
+sequenceDiagram
+  user->>"CloudFront Function": viewer request
+  "CloudFront Function"->>origin: origin request
+  origin->>"CloudFront Function": origin response
+  "CloudFront Function"->>user: viewer response
+```
+
+| CloudFront Function | Lambda@Edge |
+|-|-|
+| lightweight JS | written in nodeJS or PY |
+| large scale, latency sensitive CDN customization | - |
+| sub-ms startup time, millions of request per second | thousands of request per second |
+| changes viewer request and response | changes viewer/origin request and response |
+| native CF feature (code managed within CF) | - |
+| - | author function in one region and CF replicates to all locations |
+| max execution time < 1ms | 5-10s |
+| max memory 2MB | 128MB - 10GB |
+| totalk package size 10kb | 1MB - 50MB |
+| no network/file system access | network/file system access |
+| no access to request body | access to request body |
+| free tier available, 1/6 of lambda@edge | no free tier, charged per request & duration |
+| no access to 3rd party library and AWS services | access to 3rd party library and AWS services |
+| limited CPU and memory | adjustable CPU and memory |
+
+CloudFront function are usually used for
+
+- cache key normalization (transform request headers/cookies/query strings/URL)
+- header manipulation
+- URL rewrite or redirects
+- Request authentication and authorization (JWT create and validate to allow or deny request)
+
 ## MISC
 
 ports to remember
@@ -196,3 +335,5 @@ ports to remember
 | http | 80 |
 | https | 443 |
 | rdp | 3389 |
+
+[1]: https://aws.amazon.com/blogs/compute/using-amazon-rds-proxy-with-aws-lambda/
