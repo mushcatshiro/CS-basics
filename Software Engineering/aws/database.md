@@ -117,7 +117,7 @@ a copy on write protocol which results in no copy until updates are made to the
 new database cluster. Storage is only then allocated and data is copied. This
 allows clonning to be fast and cost effective.
 
-### Backup For RDS And Aurora
+#### Backup For RDS And Aurora
 
 | - | RDS | Aurora |
 |-|-|-|
@@ -132,7 +132,7 @@ Restoring snapshots creates a new database. Backup can be created for on prem
 database and restore to cloud through S3. Note that for Aurora cluster, Percona
 XtraBackup is needed.
 
-### Security For RDS And Aurora
+#### Security For RDS And Aurora
 
 At rest, data are encrypted using KMS (defined during creation time). If master
 is not encrypted, replication will not be encrypted. To encrypt unencrypted
@@ -143,6 +143,44 @@ At flight TLS is ready and uses AWS TLS root certificate.
 IAM authentication is available and IAM roles can be defined. Security group
 can help to filter unwanted connections and audit log can be enabled to send to
 CloudWatch.
+
+## NoSQL
+
+### DynamoDB
+
+Fully managed (severless), HA with replication across multi-AZ NoSQL service
+with transaction support. It is internally distributed thus it scales to
+massive workloads. It can handle millions or request per second, have trillions
+of rows, and have hundreds of TB of storage. It is fast and consistent in
+performance (single digit ms). It integrates well with IAM. DynamoDB is low
+cost and have auto scaling capabilities. It is always available and have
+standard and infrequent access table class.
+
+DynamoDB is made of Tables. Each table has a primary key and must be decided at
+creation time. Each table can have infinite rows/items and each item has
+attributes (columns) that can be added over time or be null. There is a 400kb
+limit for item size. Data types supported are
+
+- scalar type: string, number, binary, boolean null
+- document type: list, map
+- set type: string set, number set, binary set
+
+The primary key is made of a partition key and sort key (optional).
+
+Provisioned Mode:
+
+- specify read/write per second (read/write capacity unit)
+- pay for provisioned RCU/WCU
+- possible to add ASG for RCU and WCU
+
+On-Demand Mode:
+
+- read/write automatically scale up/down with workload
+- no capacity planning
+- pay per use and is much expensive
+- good for unpredictable workload
+
+> keyword: ever evolving schema
 
 ## ElastiCache
 
