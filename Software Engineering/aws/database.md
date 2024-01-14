@@ -45,12 +45,19 @@ It is possible for RDS to be promoted from single AZ to multi AZ with no
 downtime by modifying the database option. RDS will take a snapshot of database
 and restore it in a new AZ and run a sync between two instance.
 
-### RDS Event Notification
+#### RDS Event Notification
 
 RDS event notification broadcast information about the database instance i.e.
 database created, stopped, started etc and not about the data itself. These
 events can be subscribed with downstream SNS or EventBridge and receive near
 real time events (up to 5 minutes).
+
+#### RDS (& Aurora) Lambda Integartion
+
+Lambda function can be invoked by the database instance to process data events
+e.g. data inserted etc. This is supported for RDS pg and Aurora MySQL. Proper
+outbound traffic to lambda function from database instance (Public, NAT, VPC
+endpoints) and IAM permission/lambda resource based policy must be setup.
 
 #### RDS Proxy
 
