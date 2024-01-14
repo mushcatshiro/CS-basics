@@ -182,6 +182,96 @@ On-Demand Mode:
 
 > keyword: ever evolving schema
 
+DynamoDB has a TTL feature which delete items that expires from the timestamp.
+TTL is an attribute in epoch time format and it is usually used for keeping
+track of must recent version or for regulatory obligation or web session
+handling.
+
+#### DynamoDB Accelerator (DAX)
+
+Fully managed, HA, seamless in memory cache for DynamoDB. It address read
+congestion by caching and allows microseconds latency for cached data. No
+application logic modification needed (compatible to Dynamodb APIs). Default
+TTL of 5 minutes.
+
+```mermaid
+graph LR
+  app ---> DAX
+  app ---> ElastiCache
+  DAX -- if cache miss ---> DDB
+```
+
+DAX is good for individual object cache or database scan and query while
+ElastiCache is good for aggregated results (computation intensive ). DAX and
+Elasticache is complimentary instead of competition.
+
+#### DynamoDB Stream Processing
+
+Ordered stream of item level modification (create/delete/update) in table for
+
+- real time reaction (welcome email)
+- real time usage analytics
+- insert to derivate tables
+- implement cross region replication
+- invoke AWS lambda to make changes
+
+| DynamoDB Streams | Kinesis Data Streams |
+|-|-|
+| 24 hour retention | 1 year retention |
+| limited number of consumers | high number of consumers |
+| lambda, DynamoDB Stream Kinesis Adapter | lambda, KDA, KDF, Glue streaming ETL |
+
+```mermaid
+graph LR
+  app -- create/delete/update ---> DDB
+  DDB ---> ds[DDB streams]
+  ds ---> KDS
+  KDS ---> KDF
+  KDF ---> S3
+  KDF ---> RedShift
+  KDF ---> OpenSearch
+  ds ---> ddbs[DDB streams]
+  subgraph p [Processing Layer]
+    p1["DDB KCL adapter\n lambda"]
+  end
+  ddbs ---> p
+  p -- messaging/notification ---> SNS
+  p -- filtering/transforming ---> DDB
+```
+
+#### DynamoDB Global Tables
+
+A two way replication of multi region table such that it is accessible with low
+latency at multiple regions. It is an active-active replication such that
+application can read and write to the table from any region. DynamoDB global
+table's underlaying replication is based on DynamoDB stream processing (to be
+enabled).
+
+#### DynamoDB Backup for Disaster Recovery
+
+Recovery always creates a new table.
+
+- continuous backup for PITR
+  - optional up to 35 days
+- on demand backup
+  - full backup for long term retention i.e. explicit delete
+  - does not affect performance/latency
+  - can be configured and manage in AWS backup (lifecycle policy, cross region copy etc)
+
+#### DynamoDB S3 Integration
+
+- export to S3
+  - with PITR enabled, DynamoDB can be exported to S3 (for Athena query)
+  - does not affect read/write capacity (for analytics)
+  - retain snapshot for audit purpose
+  - ETL on top of S3 before importing back to DynamoDB
+  - in JSON format or ION format
+- import from S3
+  - import CSV, DynamoDB JSON or ION format
+  - does not consume write capacity
+  - creates a new table
+  - import errors are available in CloudWatch logs
+
 ## ElastiCache
 
 Managed redis and memcached that gives high performance and low latency
