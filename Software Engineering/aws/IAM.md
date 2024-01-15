@@ -131,14 +131,69 @@ last used.
 
 ## AWS Cognito
 
+Provide users an identity to interact with web or mobile application, these
+users generally are outside of AWS account.
+
+- Cognito User Pool (authentication)
+  - sign in functionality for app users
+  - integrate with API gateway and ALB
+- Cognito Identity Pool (authorization)
+  - provide temporary AWS credentials to users to access AWS resource directly
+  - works with Cognito User Pool as an identity provider
+
 ### Cognito User Pool
 
+Creates a serverless database of users for web and mobile app through simple
+username/password login. It supports password reset, email/phone number
+verification, MFA and federated identities from FB, Google, SAML etc.
+
+API gateway
+
+```mermaid
+graph LR
+  client <-- auth/retrieve token --> CUP
+  client <-- rest API + token --> agw[API gateway]
+  agw <-- evaluate Cognito token --> CUP
+  agw ---> backend
+```
+
+ALB
+
+```mermaid
+graph LR
+  client ---> ALB
+  ALB <-- auth --> CUP
+  ALB ---> be[backend target group]
+
+```
+
 ### Cognito Identity Pool
+
+Provide AWS account identity for users ie. temporary AWS credentials. Users can
+be from Cognito User Pool, 3rd party logins and etc. Users can then access AWS
+services directly or through API gateway. The IAM policies applied to
+credentials are defined in Cognito. The IAM policies can also be customized
+based on `user_id` for fine grain control. A default IAM role can be defined
+such that users (guest or authenticated) that dont have specific roles can
+inherit from the default IAM role.
+
+```mermaid
+graph LR
+  client <-- 1. login and get token --> login[3rd party/CUP]
+  client -- 2. exchange token for temp AWS credentials --> CIP
+  CIP <-- 3. validate --> login
+  CIP -- 4. attach IAM role --> client
+  client -- 5. direct access to AWS --> AWS[AWS S3/DDB]
+```
+
+With Cognito Identity Pool, a row level security in DynamoDB can be setup such
+that only if the leading key of DynamoDB is same as the cognito `user_id`, the
+user can perform certain action.
 
 ## scratchpad
 
 allow to impersonate? (whats the service/context)
 
-billing info to set budget
+billing info to set budge
 
 general intro to region/AZ/POP etc
