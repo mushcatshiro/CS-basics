@@ -52,7 +52,7 @@ database created, stopped, started etc and not about the data itself. These
 events can be subscribed with downstream SNS or EventBridge and receive near
 real time events (up to 5 minutes).
 
-#### RDS (& Aurora) Lambda Integartion
+#### RDS (& Aurora) Lambda Integration
 
 Lambda function can be invoked by the database instance to process data events
 e.g. data inserted etc. This is supported for RDS pg and Aurora MySQL. Proper
