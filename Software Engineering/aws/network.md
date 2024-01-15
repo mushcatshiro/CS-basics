@@ -361,3 +361,53 @@ AWS global accelerator works with the endpoints below
 | proxy packet at edge to one or more AWS region | N | Y |
 | gaming (UDP)/IOT (MQTT)/VOIP | N | Y |
 | HTTP use cases that requires static IP | N | Y |
+
+## API Gateway
+
+A few options that can expose a lambda function to client
+
+- expose directly which clients would need IAM permissions
+- fronted by an ALB and expose it as a HTTP endpoint
+- fronted by API gateway and use it as an proxy to lambda (more than HTTP endpoint)
+
+> take note of the default API gateway timeout is independent of lambda's
+
+API gateway is a serverless option to create public accesssible REST api. A
+list of features including
+
+- WebSocker support
+- API versioning support
+- multiple environment support
+- security (authentication and authorization)
+- API keys creation
+- request throttling
+- import/export Swagger/Open API to define API
+- transform and validate request and responses
+- generate SDK and API spec
+- caching
+
+API gateway is flexible and allows exposing HTTP endpoints and any AWS service
+besides lambda function. With the features provided out of the box, it is
+easier to manage an API with API gateway.
+
+### Endpoint Types
+
+- edge optimized (default) for global clients
+  - request are routed through CloudFront Edge location however, API gateway is in one region
+- regional
+  - can manually combine with CloudFront (more control over CloudFront cache etc.)
+- private
+  - access only from VPC using ENI
+  - use resource policy to define access
+
+### Security
+
+Users can be authenticated through IAM roles (internal applications), AWS
+Cognito (for external users) or custom authorizer (own logic in lambda).
+
+Custom domain name HTTPS is integrated with AWS Certificate Manager,
+
+- edge optimized must have certificate in `us-east-1`
+- regional endpoint must have certificate in the same region as API gateway
+
+and CNAME or A-alias record must be setup in R53.

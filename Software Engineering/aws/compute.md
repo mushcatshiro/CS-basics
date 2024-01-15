@@ -324,6 +324,18 @@ CloudFront function are usually used for
 - URL rewrite or redirects
 - Request authentication and authorization (JWT create and validate to allow or deny request)
 
+## Step Functions
+
+Builds a serverless visual workflow to orchestrate lambda functions. It offers
+feature like execution sequencing, parallel, conditions, timeouts, error
+handling and etc. It ingetrates will with AWS services e.g. EC2, ECS, on-prem
+servers, API gateway, SQS and etc. It allows human approval. A few use cases
+including
+
+- order fulfillment
+- data processing
+- web application
+
 ## MISC
 
 ports to remember
