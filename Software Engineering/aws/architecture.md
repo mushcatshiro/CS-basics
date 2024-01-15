@@ -157,3 +157,101 @@ graph LR
   eb ---> SNS
   SNS -- email --> admin
 ```
+
+## Serverless
+
+### serverless architecture 1
+
+Requirements
+
+- serverless
+- expose REST api with HTTPS
+- user directly interact with their own folder in S3
+- user authenticate with serverless service
+- user can read/write but mainly read
+- database should scale and have high read throughput
+
+```mermaid
+graph LR
+  client ---> agw[AWS API gateway]
+  agw -- cache ---> agw
+  client <-- authenticate/authorize --> ac[AWS Cognito/AWS STS]
+  agw <---> ac
+  agw ---> lambda
+  lambda ---> d[DAX/DDB]
+  client -- store/retrieve --> S3
+```
+
+### serverless architecture 2
+
+- website that scale globally
+- rare write and often read
+- some of the site is pure static files and the rest is dynamic REST API
+- caching whenever possible
+- welcome email for new users
+- thumbnail generated for all photo uploaded
+
+```mermaid
+graph LR
+  client <---> CloudFront
+  CloudFront <-- origin access control --> s[S3 with bucket policy only CF dist]
+  client ---> agw[API gateway]
+  agw ---> lambda
+  lambda ---> d[DAX/DDB/DDB global table]
+  d ---> ddbs[DDB stream]
+  ddbs ---> l[lambda]
+  l ---> ses[Simple Email Service]
+  client ---> s2[S3 transfer acceleration]
+  s2 ---> l2[lambda]
+  l2 -- thumbnail --> S3
+
+```
+
+## Microservice
+
+Requirements
+
+- service interact with each other using REST api
+- each service's architecture may vary in form and size
+- a microservice architecture with leaner development lifecycle
+
+```mermaid
+graph LR
+  client ---> R53
+  client -- https --> ELB
+  subgraph "ELB route"
+    ELB ---> ECS
+    ECS ---> DDB
+  end
+  client ---> agw[API gateway]
+  subgraph "API gateway"
+    agw ---> lambda
+    lambda ---> elasticache
+  end
+  client ---> ELB2[ELB]
+  subgraph "EC2 route"
+    ELB2 ---> ec2[EC2 + ASG]
+    ec2 ---> RDS
+  end
+  ec2 -.-> agw
+  lambda -.-> ELB
+```
+
+> note the above is a synchronous pattern, async can be applied with SQS,
+> Kinesis, lambda triggers (S3) and etc
+
+## Software Update Offloading
+
+EC2 that distributes software update, lots of request when ned update is out.
+Prefers minimum changes to application but would like to optimize cost and CPU.
+
+```mermaid
+graph LR
+  client ---> CloudFront
+  CloudFront ---> ELB
+  ELB ---> ASG
+  ASG ---> EC2
+  EC2 ---> EFS
+```
+
+Network cost and ASG is minimized and the updates are cached at edge.
