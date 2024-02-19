@@ -13,7 +13,7 @@ over time.
 EBS snapshot has an archive option to make them ~75% cheaper and takes 24-72
 hours to restore. Deleted snapshots are available in recycle bin. It is
 possible to setup retention rules betwen 1 - 365 days for recovery. Another
-options is to allow fast snapshot restore which allows full initialization of
+option is to allow fast snapshot restore which allows full initialization of
 snapshot with no latency on first use/creation forcefully.
 
 ### EBS Volume Type
@@ -108,6 +108,9 @@ storage. It can be used as
 - application/static site/media hosting
 - big data storage and analytics
 - software delivery (patches)
+
+> S3 is generally good for bigger objects and less great for many smaller
+> objects
 
 S3 although is presented like a directory/file system, however is more like a
 key value store from the underlying infrastructure perspective. All buckets
@@ -303,7 +306,7 @@ Glacier has an glacier vault lock option adopts a Write Once Read Many model by
 creating a vault lock policy. The vault lock prevents object from future edits
 and it is helpful for compliance and data retention.
 
-A similar option is available for no glacier S3 known as S3 object lock which
+A similar option is available for non glacier S3 known as S3 object lock which
 blocks object deletion for specified amount of time and requires versioning.
 There are two modes,
 
@@ -530,7 +533,7 @@ graph LR
   a -- IAM role ---> EFS
 ```
 
-## DataSync
+## AWS DataSync
 
 Scheduled data moving/replication task between
 
