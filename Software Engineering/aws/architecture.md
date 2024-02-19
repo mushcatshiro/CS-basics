@@ -255,3 +255,31 @@ graph LR
 ```
 
 Network cost and ASG is minimized and the updates are cached at edge.
+
+## Big Data Ingestion Pipeline
+
+requirements
+
+- fully serverless
+- real time data collection
+- data xfromation
+- query the xformed data using SQL
+- report created using queries should be in S3
+- data to be loaded into warehouse and create dashboards
+
+```mermaid
+graph LR
+  i1[IoT devices] ---> i2[IoT Core to manages devices]
+  i2 --real time---> KDS
+  KDS ---> KDF
+  KDF --every 1 minute---> S3
+  l1[lambda] ---> KDF
+  S3 -- optional ---> SQS
+  SQS ---> l2[lambda]
+  S3 ---> l2
+  l2 --sql query---> Athena
+  Athena ---> S3
+  Athena -- report ---> S3
+  S3 ---> qs[QuickSight]
+  S3 ---> rs[RedShift]
+```

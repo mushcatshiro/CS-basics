@@ -11,6 +11,8 @@ for disaster recovery. RDS can be scaled both vertically and horizontally.
 RDS's is build on top of EBS (gp2 or io). For managed instance, SSH is not
 allowed. RDS's maintenance will results in some downtime.
 
+> provisioned RDS instance size and EBS volume type/size to be specified.
+
 Auto scaling of RDS can be setup such that the storage increase dynamically by
 setting a maximum storage threshold e.g. free storage is < 10% of provisioned
 storage. Auto scaling is suitable for unpredictable workloads.
@@ -71,6 +73,8 @@ RDS proxy is never publicly acccessible, traffic must be from VPC.
 
 #### Aurora
 
+> separation of storage and compute
+
 Database compatible to postgres and mysql that is cloud optimized (generally
 better than their RDS counterpart). Auto scales storage in increments of 10 -
 128 GB with scaling policy. Can have up to 15 read replicas with ~10ms of
@@ -83,7 +87,7 @@ copies are needed for write and 3 out of 6 for reads. Aurora has self healing
 capabilities through peer to peer replication. The data is stored in hundreds
 of volumnes.
 
-Aurora provides a write endpoint DNS for master and a reader endpoint DNS with
+Aurora provides a writer endpoint DNS for master and a reader endpoint DNS with
 connection load balancer. Custom endpoints can be created for different use
 cases e.g. OLAP etc. When custom endpoints is used, the default reader endpoint
 should not be used. With custom enpoints that is meant for OLAP more powerful
@@ -115,7 +119,8 @@ RTO of < 1 minute.
 Creates a new one from the existing one for testing/development purposes. Uses
 a copy on write protocol which results in no copy until updates are made to the
 new database cluster. Storage is only then allocated and data is copied. This
-allows clonning to be fast and cost effective.
+allows clonning to be fast and cost effective. It is also faster than restoring
+a snapshot.
 
 #### Backup For RDS And Aurora
 
@@ -165,13 +170,15 @@ limit for item size. Data types supported are
 - document type: list, map
 - set type: string set, number set, binary set
 
+> it is great for rapidly evolving schemas
+
 The primary key is made of a partition key and sort key (optional).
 
 Provisioned Mode:
 
 - specify read/write per second (read/write capacity unit)
 - pay for provisioned RCU/WCU
-- possible to add ASG for RCU and WCU
+- possible to add ASG for RCU and WCU (auto-scaling option?)
 
 On-Demand Mode:
 
@@ -272,12 +279,82 @@ Recovery always creates a new table.
   - creates a new table
   - import errors are available in CloudWatch logs
 
+### DocumentDB
+
+DocumentDB is the managed/AWS-implemented MongoDB. It has similar deployment
+concepts as Aurora, i.e. HA with replication across 3AZ. It stores, queries and
+indexes JSON data. Its storage automatically grows in increments of 10GB. It
+scales to workloads with millions of request per seconds.
+
+## Amazon Keyspaces (for Apache Cassandra)
+
+Managed Apache Cassandra compatible distributed NoSQL database service. It will
+be able to scale table up and down based on application traffic. Tables are
+replicated 3 times across multiple AZ and uses CQL (Cassandra Query Language).
+Provides single digit ms latancy at any scale, thousands of request per second.
+Similar to DDB, there are two capacity modes
+
+- on demand mode
+- provisioned mode with auto scaling
+
+Encryption, backup (PITR up to 35 days) are also options provided. It is
+commonly used for storing IoT device information, time series data and etc.
+
+## Amazon Neptune
+
+Fully managed graph database (think social network as the graph dataset). HA
+across 3 AZ with up to 15 read replicas. Build and run application with highly
+connected datasets (optimized for complex and hard queries). Stores billions of
+relations and query graph within ms range latency. Other use cases including
+storing knowledge graphs (Wikipedia), fraud detection, recsys and etc.
+
+## Amazon QLDB
+
+Quantum ledger database to record financial transactions. It is fully managed,
+serverless, HA, have replication across 3 AZ. It is used to review history of
+all changes made to application data over time. It is immutable such that no
+entry can be removed or deleted and it is cryptogrphically verifiable. 2-3
+times better performance than common blockchain ledger frameworks and allows
+user to manipulate date with SQL.
+
+> difference from Amazon Managed Blockchain is that there is QLDB has no
+> concept of decentralization, it is a centralized database owned by AWS and is
+> in accordance with financial regulation rules.
+
+## Amazon Timestream
+
+Fully managed, fast, scalable, serverless time series database. It
+automatically scales up and down based on capacity. Is can store and analyze
+trillions of events per day. It is 1000s faster and cost 1/10 of relational
+databases. The data storage is tiered such that recent data is in memory and
+historical data is in cost optimized storage. It is build in with time series
+analysis functions (near real time performance) and is able to run scheduled
+queries, multi-measure records and is SQL compatible. Data stored are encrypted
+in transit and at rest.
+
+> uses cases including IoT apps, operational apps, real time analytics and etc.
+
+Upstream compatibility
+
+- AWS IoT
+- KDS/lambda
+- AWS MSK
+
+Downstream compatibility
+
+- Amazon QuickSight
+- Amazon SageMaker
+- Grafana
+- any JDBC connection
+
 ## ElastiCache
 
 Managed redis and memcached that gives high performance and low latency
 (submiliseconds). Helps to reduce load on database and makes application
 stateless (potentially balance the EC2 instances). Supports cache invalidation
 strategy for data update.
+
+> managed and scheduled maintenance
 
 | feature | Redis | Memcached |
 |-|-|-|
@@ -299,8 +376,12 @@ strategy for data update.
 | security group | Y | Y |
 | SSL in flight | Y | Y |
 | SASL | N | Y |
+| KMS encryption at rest (option) | Y | Y |
+| default service managed encryption at rest | Y | Y |
 
 ### Patterns For ElastiCache
+
+> application code changes is required
 
 - lazy loading: all read to cache (stale cache and cache invalidation)
 - write-through: add/update data in cache when updated to database (no stale)
@@ -319,6 +400,18 @@ SQL supports join, sql query statements.
 - aurora handles load better
 - rds more configs
 - rds on ssd
+
+## Choosing the right database
+
+- read/write heavy? balanced workload? throughput need?
+  - stable/dynamic workload
+- how much data, for how long? is it growing? average object size?
+  - how are they accessed?
+- data durability? source of truth for data?
+- latency requirements? concurrent users?
+- data model? how data is queried? joined? structured? semi structured?
+- strong schema? flexibility? reporting? search? rdbms/nosql?
+- license cost? cloud native aurora?
 
 ## MISC
 
