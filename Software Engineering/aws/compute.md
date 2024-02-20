@@ -124,7 +124,13 @@ is allowed on outbound/inbound.
 
 - cluster: cluster instance into low latency group in single AZ (high network throughput on same rack, high risk of catastrophic failure)
 - spread: spread instances across underlying hardware (max 7 per AZ) for HA
+  - spread is for smaller number of EC2s
+  - HA but not high performant (network cost)
+  - one rack per instance
 - partition: spread instances across many partitions (racks) within AZ, up to hundreds of EC2 per group and up to 7 partion in AZ
+  - partition is more towards distributed systems e.g. kafka etc.
+  - allows to launch in to specific partition
+  - middle ground between HA, HPC and fault tolerance
 
 ## Amazon Machine Image (AMI)
 
