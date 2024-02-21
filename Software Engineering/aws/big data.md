@@ -32,12 +32,7 @@ Allows user to run SQL queries across data stored in relational,
 non-relational, object and custom data sources (AWS/on-prem) using data source
 connectors that run with Lambda. Queried results can be stored to S3.
 
-```mermaid
-graph LR
-  a[Athena] ---> l[Lambda]
-  l ---> t[target DDB/ElastiCache/on prem/HBase]
-  a -- store ---> s[S3]
-```
+![fed-q](fed-q.PNG)
 
 ## RedShift
 
@@ -95,36 +90,11 @@ OpenSearch Dashboards.
 
 OpenSearch DDB common pattern
 
-```mermaid
-graph LR
-  DDB ---> ds[DDB Stream]
-  ds ---> l[Lambda]
-  l ---> os[OpenSearch]
-  EC2 <--API to retrieve items---> DDB
-  EC2 <--API to search items---> os
-```
+![os-pat-1](os-pat-1.PNG)
 
-OpenSearch CloudWatch Logs common pattern
+OpenSearch CloudWatch Logs and KDS common pattern
 
-```mermaid
-graph LR
-  cw[CloudWatch Logs] ---> sf[Subscription Filter]
-  sf ---> l[AWS managed lambda fn]
-  l --real time---> os[OpenSearch]
-  sf ---> KDF
-  KDF --near real time---> os
-```
-
-KDS common pattern
-
-```mermaid
-graph LR
-  KDS --near real time--->KDF
-  KDF -- optional---> l[lambda]
-  l ---> os[OpenSearch]
-  KDS --real time---> l2[lambda]
-  l2 ---> os
-```
+![os-pat-2](os-pat-2.PNG)
 
 ## EMR
 

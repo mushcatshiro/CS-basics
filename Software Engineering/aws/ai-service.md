@@ -56,13 +56,7 @@ call centers.
 
 flow of scheduling an appointment
 
-```mermaid
-graph LR
-  phone ---> Connect
-  Connect ---> Lex
-  Lex ---> Lambda
-  Lambda ---> CRM
-```
+![lex-connect](lex-connect.PNG)
 
 ## Comprehend
 
