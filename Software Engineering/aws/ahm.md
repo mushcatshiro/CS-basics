@@ -14,8 +14,8 @@ monitoring. Also custom metrics can be created.
 #### CloudWatch Metric Streams
 
 Stream CloudWatch metrics to a destination of choice in near real time delivery
-and low latency with KDF or to 3rd parth service provider e.g. datadog. There
-is an option to filter metrics such that only a subset of them is streammed.
+and low latency to KDF or to 3rd parth service provider e.g. datadog. There is
+an option to filter metrics such that only a subset of them is streammed.
 
 > default is every 5 minutes and with detailed monitoring enabled per minute
 > metric is gathered.
@@ -35,7 +35,7 @@ logs can be send to
 
 The logs are encrypted by default, KMS-based encryption with custom keys is
 also possible. Sources for CloudWatch Logs including CW Logs SDK, CloudWatch
-Logs Agent and CloudWatch Unified Agent (to be deprecated). Elastic Beanstalk's
+Logs Agent (to be deprecated) and CloudWatch Unified Agent. Elastic Beanstalk's
 containers log collection, AWS lambda's function log, VPC logs, CloudTrail
 (optional filter) logs, R53 DNS query logs and etc are sent to CloudWatch Logs.
 Logs in CW Logs can be queried using CloudWatch Logs Insights for data
@@ -91,6 +91,9 @@ conditions. Complex composite alarms is possible to reduce noise.
 > CLI commands
 
 ### Amazon EventBridge
+
+> TODO: move it out as independent section with more details; similar to CW and
+> CT to get a better understanding of the services.
 
 rules:
 
