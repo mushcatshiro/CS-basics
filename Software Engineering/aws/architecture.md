@@ -287,3 +287,7 @@ graph LR
 ## S2S VPN Connection as Backup
 
 ![dx s2s](dx-s2s.PNG)
+
+## Shared DX Between Multiple Accounts
+
+![dx mul](dx-mul.PNG)
