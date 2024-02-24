@@ -283,3 +283,7 @@ graph LR
   S3 ---> qs[QuickSight]
   S3 ---> rs[RedShift]
 ```
+
+## S2S VPN Connection as Backup
+
+![dx s2s](dx-s2s.PNG)

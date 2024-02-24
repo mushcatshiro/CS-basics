@@ -68,7 +68,7 @@ Good use case when having thousands of lambda functions. It improves the
 database efficiency by reducing stress on database resource and minimized
 open connections. RDS proxy is able to auto scale and is high available through
 multiple AZ. It improved the failover time ~66%. Supports RDS and Aurora. It
-enforces IAM authentication and credentials are stored in AWS secrets manager.
+enforces IAM authentication and credentials are stored in AWS Secrets Manager.
 RDS proxy is never publicly acccessible, traffic must be from VPC.
 
 #### Aurora

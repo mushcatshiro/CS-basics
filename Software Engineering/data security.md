@@ -31,7 +31,7 @@ for data at transit, AWS encourages to leverage a multi-level approach. all netw
 
 data is encrypted before sending and decrypted after receiving. TLS certificate
 helps with the encryption (HTTPS). this ensures that there is no man in the
-middle attach.
+middle attack.
 
 ## server-side encryption/at rest
 
@@ -41,6 +41,8 @@ stored encrypted with a key (KMS).
 ## client side encryption
 
 data is encrypted by client and never decrypted by server but is decrypted by
-the receiving client.
+the receiving client. this can be further leverage on envelope encryption by
+encrypting the key using another key. these keys are used outside of AWS to
+encrypt the data.
 
 [reference](https://docs.aws.amazon.com/whitepapers/latest/logical-separation/encrypting-data-at-rest-and--in-transit.html)

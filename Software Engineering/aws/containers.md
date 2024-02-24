@@ -23,7 +23,7 @@ CPU/RAM required.
 
 ALB is supported and works for most use cases to expose tasks within the ECS
 clusters to users. NLB can be used for high throughput/performance use cases or
-pairing it with AWS Private Link.
+pairing it with AWS PrivateLink.
 
 Persistence is achieve by mounting EFS on to ECS tasks. It is compatible with
 both launch types. Task running in different AZ will share same data and it is

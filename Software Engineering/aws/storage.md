@@ -127,6 +127,8 @@ than 5GB to use multi-part upload. Each object has,
   - files prior to versioning enabled will have version null
   - suspeding versioning will not delete pervious version
 
+### S3 Bucket Replication
+
 S3 bucket replication allows for both cross- and same- region replication
 through setting replication rule. Versioning must be enabled in both source
 and destination region. The buckets can be in different AWS accounts and the
@@ -445,18 +447,7 @@ FSx for Lustre
     - replace failed files within minutes
     - long term processing/sensitive data
 
-```mermaid
-graph LR
-  subgraph AZ1
-    c1[compute instance] <--> ENI
-    ENI ---> f[FSx for lustre]
-  end
-  subgraph AZ2
-    c2[compute instance] <--> ENI
-  end 
-  f <--> S["S3 bucket (optional)"]
-
-```
+![fsx-lustre](fsx-lustre.PNG)
 
 > only difference is if its persistent, it has replication in same AZ
 
@@ -488,16 +479,7 @@ S3 file GW caches the most trecently used data at the file GW. Bucket access
 uses IAM roles for each file GW. SMB protocol has integration with Active
 Directory for user authentication.
 
-```mermaid
-graph LR
-  subgraph "on prem"
-    a[app server] -- NFS or SMB ---> s[S3 file gateway]
-  end
-  s -- HTTPS ---> s3
-  subgraph "AWS cloud"
-  s3[non glacier s3 bucket] -- lifecycle policy ---> s3g[s3 glacier]
-  end
-```
+![file-gw](file-gw.PNG)
 
 FSx file GW allows native access to AWS FSx for windows file server and caches
 frequently accessed data. It has native windows compatibility (SMB, NTFS, AD).
@@ -524,14 +506,7 @@ credentials within the service and it integrates with existing authentication
 systems (msft AD, LDAP, Amazon Cognito, custom). Uses cases including sharing
 files, public datasets, CRM and ERP.
 
-```mermaid
-graph LR
-  u[FTP users] ---> r["R53 (optional)"]
-  r ---> a[AWS transfer family]
-  a <-- Auth ---> auth[auth service]
-  a -- IAM role ---> S3
-  a -- IAM role ---> EFS
-```
+![xfer-fam](xfer-fam.PNG)
 
 ## AWS DataSync
 
