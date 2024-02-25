@@ -5,7 +5,9 @@
 A logical component in VPC that represets a virtual network card. It allows
 
 - 1 primary IPv4, 1 or more secondary IPv4
-- 1 elastic IP or 1 public IP per private IP
+- 1 elastic IP per private IP
+- 1 public IPv4 address
+- 1 or more IPv6 address
 - 1 or more security groups
 - provide mac address
 - bound to AZ
@@ -449,8 +451,8 @@ to assign CIDR is to not overlap with the other communicating networks.
 ### AWS Subnets
 
 Subnets are just a subrange of IPv4 address within VPC. New subnets unless
-specified are associated to the default VPC i.e. grabs a share ($2^12$) of
-the $2^16$ IPs. These subnets are in some availability zone within the VPC
+specified are associated to the default VPC i.e. grabs a share $2^{12}$ of the
+$2^{16}$ IPs. These subnets are in some availability zone within the VPC
 region. $5$ IPs are reserved, namely the first 4 and last 1.
 
 - `0` will be the network address
@@ -478,10 +480,10 @@ An example
 | 3 | 172.31.0.0/16 | pcx-123 |
 | 4 | ::/0 | eigw-123 |
 
-1 implies enablement of internet access through IGW. 2 implies IPv4 traffic
-routed within VPC (10.0.0.0/16) is covered by local route. 3 implies IPv6
-traffic within VPC is covered by peer connection. 4 implies IPv6 internet
-traffic goes through `eigw`.
+1. implies enablement of internet access through IGW.
+2. implies IPv4 traffic routed within VPC (10.0.0.0/16) is covered by local route.
+3. implies IPv6 traffic within VPC is covered by peer connection.
+4. implies IPv6 internet traffic goes through `eigw`.
 
 ### AWS Internet Gateway (IGW)
 

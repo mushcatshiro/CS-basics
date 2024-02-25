@@ -413,6 +413,42 @@ SQL supports join, sql query statements.
 - strong schema? flexibility? reporting? search? rdbms/nosql?
 - license cost? cloud native aurora?
 
+## Database Migration Service
+
+A quick and secure database migration to AWS service which is also resilient
+and have have self healing capabilities. Source database will be available
+during the migration. The service supports
+
+- homogeneous migration e.g oracle to oracle
+- heterogeneous migration e.g. mssql to Aurora
+
+It supports continuous data replication with change data capture (CDC). DMS
+replies user to create an EC2 instance to perform replication tasks. AWS offers
+a Schema Convertion Tool (SCT) in case the target and source database are using
+different engine. DMS has a multi-AZ deployment option to provision and
+maintain a synchronous stand replica in a different AZ. This has the advantage
+of having redundancy, eliminates I/O freeze and minimize latency spikes.
+
+> covers on prem to cloud, cloud to cloud and cloud to on prem
+
+### On prem or RDS to Aurora Migration
+
+- RDS to Aurora
+  - DB snapshot from RDS to restore as Aurora
+    - with downtime i.e. stop RDS -> backup -> restore
+  - create Aurora read replica from RDS and wait for replication lag to be 0
+    - takes time and cost $
+- external to Aurora
+  - mysql
+    - Percona XtraBackup to S3 and create Aurora from S3
+    - create Aurora DB and use `mysqldump` utility (slower than S3)
+  - pg
+    - create backup and send to S3 then import using `aws_s3` Aurora extension
+
+> use DMS if both database are up and running
+
+![cont repl](cont-repl.PNG)
+
 ## MISC
 
 | database | port |
