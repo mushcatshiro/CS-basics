@@ -274,3 +274,40 @@ mainly converts IP address to MAC address. in RFC1122 mention ARP within link la
 ## 20. IP address and MAC address
 
 IP address can be think of as postal address, and MAC address can be think of as the actual receipient. having both resolves the problem where within a subnet all nodes shares the same IP address. network switch is responsible for transfering frames from a MAC address to another. router identifies IP address and transmit the packet to destination IP.
+
+## 21. Classless Inter-Domain Routing (CIDR)
+
+A method for allocating IP addresses. A CIDR goes by `X.X.X.X/Y` where `Y` are
+values between 0 - 32. `Y` indicates the actual range of IPs, which $32$
+implies one IP address and $0$ (usually goes by `0.0.0.0/0`) which implies all
+possible IPv4 addresses. A formal name for `Y` is a subnet mask that represents
+number of bits can be changed in the IP. `Y` assign bits from left to right,
+thus
+
+| bits | max IP |
+|-|-|
+| /8 | 255.0.0.0 |
+| /16 | 255.255.0.0 |
+
+The unassigned bits are the range allowed. An easy approach to visualize how
+the bits are assigned is the following,
+
+$$
+00000000.00000000.00000000.00000000
+$$
+
+For each bit assigned, those to the left are fixed and those to the right are
+free.
+
+The `X.X.X.X` part is known as the base IP and each block of `X` is known as an
+octet.
+
+Internet Assigned Number Authority (IANA) established an consensus for the
+range of IPv4 addresses to be used for private (LAN) and public (internet)
+access. Private IP range are the following
+
+- 10.0.0.0/8
+- 172.16.0.0/12 (AWS default VPC is in this range)
+- 192.168.0.0/16 (home network router)
+
+Those are not in the range are public IPs.

@@ -493,7 +493,7 @@ backed by EBS snapshots for quick restore.
 - stored volume: dataset on prem and scheduled backups to S3
 
 Tape GW for physical tape backup process to be backup on cloud using Virtual
-Tap Library backed by AWS S3 and Glacier. Backup data is using existing tape
+Tape Library backed by AWS S3 and Glacier. Backup data is using existing tape
 based process and iSCSI interface.
 
 ## AWS Transfer Family

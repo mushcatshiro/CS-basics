@@ -201,12 +201,7 @@ congestion by caching and allows microseconds latency for cached data. No
 application logic modification needed (compatible to Dynamodb APIs). Default
 TTL of 5 minutes.
 
-```mermaid
-graph LR
-  app ---> DAX
-  app ---> ElastiCache
-  DAX -- if cache miss ---> DDB
-```
+![dax ddb cache](dax-ddb-cache.PNG)
 
 DAX is good for individual object cache or database scan and query while
 ElastiCache is good for aggregated results (computation intensive ). DAX and
@@ -228,23 +223,7 @@ Ordered stream of item level modification (create/delete/update) in table for
 | limited number of consumers | high number of consumers |
 | lambda, DynamoDB Stream Kinesis Adapter | lambda, KDA, KDF, Glue streaming ETL |
 
-```mermaid
-graph LR
-  app -- create/delete/update ---> DDB
-  DDB ---> ds[DDB streams]
-  ds ---> KDS
-  KDS ---> KDF
-  KDF ---> S3
-  KDF ---> RedShift
-  KDF ---> OpenSearch
-  ds ---> ddbs[DDB streams]
-  subgraph p [Processing Layer]
-    p1["DDB KCL adapter\n lambda"]
-  end
-  ddbs ---> p
-  p -- messaging/notification ---> SNS
-  p -- filtering/transforming ---> DDB
-```
+![ddb strm](ddb-strm.PNG)
 
 #### DynamoDB Global Tables
 

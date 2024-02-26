@@ -84,20 +84,7 @@ data in real time.
 
 ### Kinesis Data Stream
 
-```mermaid
-graph LR
-  subgraph Producers
-    p["app client\n sdk/kinesis producer library\n kinesis agent"]
-  end
-  subgraph KDS
-    s["shard 1\n ...\n shard N"]
-  end
-  subgraph Consumers
-    c["sdk/kinesis client library\n lambda\n KDF\n KDA"]
-  end
-  Producers -- in records ---> KDS
-  KDS -- out records ---> Consumers
-```
+![kds](kds.PNG)
 
 > Number of shards is defined and provisioned ahead of time that serves as
 > stream capacity.
@@ -128,22 +115,7 @@ endpoints available to access within VPC and monitoring through CloudTrail.
 
 ### Kinesis Data Firehose
 
-```mermaid
-graph LR
-  subgraph Producers
-    p["app client\n sdk/kinesis producer library\n kinesis agent\n KDS\n CloudWatch\n AWS IoT"]
-  end
-  KDF
-  subgraph Consumers
-    c1["AWS S3\n Amazon RedShift (COPY through S3)\n Amazon OpenSearch"]
-    c2[HTTP endpoint]
-    c3["datadog\n splunk\n mongodb"]
-  end
-  Producers -- in records (1MB) ---> KDF
-  KDF <-- data transform ---> lambda
-  KDF -- batch writes ---> Consumers
-  KDF -- all or failed data ---> s[S3 backup bucket]
-```
+![kdf](kdf.PNG)
 
 Fully managed auto scaling serverless ingestion service. Pay as data going
 through firehose pricing model. It is near real time (60s latency minimum for

@@ -7,19 +7,7 @@ use random public IP + DNS or load balancer with no public IP at all.
 
 ## Simple Web App
 
-```mermaid
-graph LR
-    subgraph WWW
-    R53 <---> u[users]
-    end
-    subgraph AZ
-    u ---> e[ELB]
-    end
-    subgraph "Auto Scaling Group"
-    e ---> ec1[ec2-1]
-    e ---> ec2[ec2-2]
-    end
-```
+![arch 1](arch-1.PNG)
 
 If ELB is used alias record is suitable, if user is directly hitting public
 EC2 instance A record will do the job (with R53).
@@ -30,27 +18,7 @@ Reserve capacity for cost optimization + on demand
 
 ### With Database
 
-```mermaid
-graph LR
-    subgraph WWW
-    R53 <---> u[users]
-    end
-    subgraph AZ
-    u ---> e[ELB]
-    end
-    subgraph "Auto Scaling Group"
-    e ---> ec1[ec2-1]
-    e ---> ec2[ec2-2]
-    end
-    subgraph Cache
-    ec1 ---> ecc[ElastiCache Cluster]
-    ec2 ---> ecc
-    end
-    subgraph Database
-    ec1 ---> RDS[RDS multi AZ + read replica]
-    ec2 ---> RDS
-    end
-```
+![arch 2](arch-2.PNG)
 
 User information is stored in client browser with ELB sticky session. Note if
 EC2 instance is terminated, the user session will be invalid.
@@ -61,27 +29,7 @@ as server side session. This is useful if user cookie is > 4kb.
 
 alternatively,
 
-```mermaid
-graph LR
-    subgraph WWW
-    R53 <---> u[users]
-    end
-    subgraph AZ
-    u ---> e[ELB]
-    end
-    subgraph "Auto Scaling Group"
-    e ---> ec1[ec2-1]
-    e ---> ec2[ec2-2]
-    end
-    subgraph Aurora
-    ec1 ---> a[Aurora multi AZ + read replica]
-    ec2 ---> a
-    end
-    subgraph "EBS/EFS"
-    ec1 ---> EBS
-    ec2 ---> EBS
-    end
-```
+![arch 3](arch-3.PNG)
 
 EFS with multiple ENIs (bound to AZ, one per AZ). Similarly EBS works however
 with a catch that its also bounded to AZ and connecting to instance might not
@@ -124,39 +72,19 @@ With EventBridge, fully serverless architecture for image processing.
 
 Event based
 
-```mermaid
-graph LR
-  client -- upload ---> S3
-  S3 -- event ---> aeb[EventBridge]
-  aeb -- run task ---> et[ECS task]
-  et <-- get from S3 --> S3
-  et -- save to ---> DDB
-```
+![ecs 1](ecs-1.PNG)
 
 or schedule based
 
-```mermaid
-graph LR
-  aeb[EventBridge] -- scheduled run task ---> et[ECS task]
-  et -- save to ---> S3
-```
+![ecs 2](ecs-2.PNG)
 
 With SQS
 
-```mermaid
-graph LR
-  msg ---> sqs
-  sqs -- poll for message ---> et[ECS task]
-```
+![ecs 3](ecs-3.PNG)
 
 Combining both SNS and EventBridge
 
-```mermaid
-graph LR
-  ecs[ECS cluster] -- task exited ---> eb[EventBridge]
-  eb ---> SNS
-  SNS -- email --> admin
-```
+![ecs 4](ecs-4.PNG)
 
 ## Serverless
 
@@ -171,16 +99,7 @@ Requirements
 - user can read/write but mainly read
 - database should scale and have high read throughput
 
-```mermaid
-graph LR
-  client ---> agw[AWS API gateway]
-  agw -- cache ---> agw
-  client <-- authenticate/authorize --> ac[AWS Cognito/AWS STS]
-  agw <---> ac
-  agw ---> lambda
-  lambda ---> d[DAX/DDB]
-  client -- store/retrieve --> S3
-```
+![arch 4](arch-4.PNG)
 
 ### serverless architecture 2
 
@@ -191,21 +110,7 @@ graph LR
 - welcome email for new users
 - thumbnail generated for all photo uploaded
 
-```mermaid
-graph LR
-  client <---> CloudFront
-  CloudFront <-- origin access control --> s[S3 with bucket policy only CF dist]
-  client ---> agw[API gateway]
-  agw ---> lambda
-  lambda ---> d[DAX/DDB/DDB global table]
-  d ---> ddbs[DDB stream]
-  ddbs ---> l[lambda]
-  l ---> ses[Simple Email Service]
-  client ---> s2[S3 transfer acceleration]
-  s2 ---> l2[lambda]
-  l2 -- thumbnail --> S3
-
-```
+![arch 5](arch-5.PNG)
 
 ## Microservice
 
@@ -215,27 +120,7 @@ Requirements
 - each service's architecture may vary in form and size
 - a microservice architecture with leaner development lifecycle
 
-```mermaid
-graph LR
-  client ---> R53
-  client -- https --> ELB
-  subgraph "ELB route"
-    ELB ---> ECS
-    ECS ---> DDB
-  end
-  client ---> agw[API gateway]
-  subgraph "API gateway"
-    agw ---> lambda
-    lambda ---> elasticache
-  end
-  client ---> ELB2[ELB]
-  subgraph "EC2 route"
-    ELB2 ---> ec2[EC2 + ASG]
-    ec2 ---> RDS
-  end
-  ec2 -.-> agw
-  lambda -.-> ELB
-```
+![arch 6](arch-6.PNG)
 
 > note the above is a synchronous pattern, async can be applied with SQS,
 > Kinesis, lambda triggers (S3) and etc
@@ -245,14 +130,7 @@ graph LR
 EC2 that distributes software update, lots of request when ned update is out.
 Prefers minimum changes to application but would like to optimize cost and CPU.
 
-```mermaid
-graph LR
-  client ---> CloudFront
-  CloudFront ---> ELB
-  ELB ---> ASG
-  ASG ---> EC2
-  EC2 ---> EFS
-```
+![arch 7](arch-7.PNG)
 
 Network cost and ASG is minimized and the updates are cached at edge.
 
@@ -267,22 +145,7 @@ requirements
 - report created using queries should be in S3
 - data to be loaded into warehouse and create dashboards
 
-```mermaid
-graph LR
-  i1[IoT devices] ---> i2[IoT Core to manages devices]
-  i2 --real time---> KDS
-  KDS ---> KDF
-  KDF --every 1 minute---> S3
-  l1[lambda] ---> KDF
-  S3 -- optional ---> SQS
-  SQS ---> l2[lambda]
-  S3 ---> l2
-  l2 --sql query---> Athena
-  Athena ---> S3
-  Athena -- report ---> S3
-  S3 ---> qs[QuickSight]
-  S3 ---> rs[RedShift]
-```
+![arch 8](arch-8.PNG)
 
 ## S2S VPN Connection as Backup
 

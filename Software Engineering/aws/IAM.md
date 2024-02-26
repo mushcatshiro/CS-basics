@@ -150,7 +150,7 @@ including
 - expiry
 - password reuse
 
-A general guideline for ASM are
+A general guideline for IAM are
 
 1. only using root to create (super)users
 2. one aws account per user
@@ -202,25 +202,7 @@ Creates a serverless database of users for web and mobile app through simple
 username/password login. It supports password reset, email/phone number
 verification, MFA and federated identities from FB, Google, SAML etc.
 
-API gateway
-
-```mermaid
-graph LR
-  client <-- auth/retrieve token --> CUP
-  client <-- rest API + token --> agw[API gateway]
-  agw <-- evaluate Cognito token --> CUP
-  agw ---> backend
-```
-
-ALB
-
-```mermaid
-graph LR
-  client ---> ALB
-  ALB <-- auth --> CUP
-  ALB ---> be[backend target group]
-
-```
+![cup](cup.PNG)
 
 ### Cognito Identity Pool
 
@@ -232,14 +214,7 @@ based on `user_id` for fine grain control. A default IAM role can be defined
 such that users (guest or authenticated) that dont have specific roles can
 inherit from the default IAM role.
 
-```mermaid
-graph LR
-  client <-- 1. login and get token --> login[3rd party/CUP]
-  client -- 2. exchange token for temp AWS credentials --> CIP
-  CIP <-- 3. validate --> login
-  CIP -- 4. attach IAM role --> client
-  client -- 5. direct access to AWS --> AWS[AWS S3/DDB]
-```
+![cip](cip.PNG)
 
 With Cognito Identity Pool, a row level security in DynamoDB can be setup such
 that only if the leading key of DynamoDB is same as the cognito `user_id`, the

@@ -92,15 +92,9 @@ Basically directing traffic to firewall/intrusion detection and prevention
 system/deep packet inspection/payload manipulation at L3 network level with
 network packages. It is transparent to incoming traffic and acts as single
 entry/exit point. It can load balance the traffic to the appliances. It uses
-GENEVE protocol on 6081 port.
+GENEVE protocol on 6081 port. Possibile to drop packages.
 
-```mermaid
-graph LR
-    g1[GWLB] ---> a[3rd appliances]
-    a ---> g2[GWLB]
-    g2 ---> d[drop]
-    g2 ---> destination
-```
+![gwlb](gwlb.PNG)
 
 Target group can be EC2 instances or IP address (private).
 
@@ -326,12 +320,7 @@ done through using Anycast IP.
 AWS global accelerator creates 2 Anycast IP for the application and leverages
 on AWS internal network (from edge location) to route to the assigned endpoint.
 
-```mermaid
-graph LR
-  c[client] ---> a[Anycast IP]
-  a ---> e[edge location]
-  e -- aws internal network ---> endpoint
-```
+![glb xlrt](glb-xlrt.PNG)
 
 AWS global accelerator has consistent performance by having lowest latency
 routing and fast regional failover. It works with client cache as the 2 anycast

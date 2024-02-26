@@ -60,34 +60,7 @@ instance attributes, get instance when current price is less than defined max
 spot price. Instance is terminated or stopped when price is greater than
 defined max spot price with 2 minute grace period.
 
-spot instance request lifecycle
-
-```mermaid
-graph LR
-    c[create] ---> sr[spot request:\n max price,\n no of instance,\n launch spec,\n one time or persistent,\n validate from, validate until]
-    sr ---> l[launch]
-    c ---> f[fail]
-    l ---> io[interupt one time]
-    l ---> ip[interupt persistent]
-    l ---s[stop persistent]
-    s ---> sr
-    ip ---> sr
-```
-
-spot instance lifecycle
-
-```mermaid
-graph TD
-    c[create request] ---> o[open]
-    o ---> failed
-    o ---> c[cancelled]
-    o ---> a[active]
-    a-- one time ---closed
-    a-- persistent ---d[disabled]
-    d-- persistent ---c
-    d-- persistent --> o
-
-```
+![ec2 spt life](ec2-spt-lc.PNG)
 
 > validate from/until can be infinite
 
@@ -206,21 +179,13 @@ image is supported as long as the container image implements the lambda
 runtime api. If it is a arbitrary Docker image, ECS/Fargate is preferred to run
 it instead.
 
-Event triggered job
+(S3 event notification) Event triggered job
 
-```mermaid
-graph LR
-  S3 -- new image added ---> lambda
-  lambda -- compress ---> s[S3]
-  lambda -- update metadata ---> DDB
-```
+![s3 evnt noti](s3-evnt-noti.PNG)
 
 Serverless CRON job
 
-```mermaid
-graph LR
-  cw[CloudWatch EventBridge] -- every 1 hour ---> lambda
-```
+![eb lmda](eb-lmda.PNG)
 
 Pricing is based on per calls and per duration.
 
@@ -265,16 +230,7 @@ is never publicly available. [1]
 Option to improve Java 11 and above performance by 10x with no extra cost. It
 is achieved by using Java AOT.
 
-```mermaid
-graph LR
-  code -- snapstart enabled ---> l1[lambda preinitialized]
-  l1 ---> i1[invoke]
-  i1 ---> s1[shutdown]
-  code -- snapstart disabled ---> l2[lambda]
-  l2 ---> i2[initialize]
-  i2 ---> ii2[invoke]
-  ii2 ---> s2[shutdown]
-```
+![lmda ss](lmda-ss.PNG)
 
 ## Edge Function
 
@@ -298,13 +254,7 @@ A few use case would be,
 
 CloudFront Function
 
-```mermaid
-sequenceDiagram
-  user->>"CloudFront Function": viewer request
-  "CloudFront Function"->>origin: origin request
-  origin->>"CloudFront Function": origin response
-  "CloudFront Function"->>user: viewer response
-```
+![cf fn](cf-fn.PNG)
 
 | CloudFront Function | Lambda@Edge |
 |-|-|
