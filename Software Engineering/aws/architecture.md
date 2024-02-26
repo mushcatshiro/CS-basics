@@ -154,3 +154,102 @@ requirements
 ## Shared DX Between Multiple Accounts
 
 ![dx mul](dx-mul.PNG)
+
+## Event Processing
+
+![arch evnt 1](arch-evnt-1.PNG)
+
+Note that the dead letter queue and lambda retry mechanism difference.
+
+### Fan Out Pattern
+
+![arch evnt 2](arch-evnt-2.PNG)
+
+### CloudTrail Event
+
+![arch evnt 3](arch-evnt-3.PNG)
+
+### API Gateway and KDS
+
+![arch evnt 4](arch-evnt-4.PNG)
+
+## Caching Strategies
+
+![arch cache](arch-cache.PNG)
+
+> S3 and database has no caching abilities
+
+## IP Blocking Strategies
+
+Depending on the infrastructure, different means might fail.
+
+![ip blck 1](ip-blck-1.PNG)
+
+![ip blck 2](ip-blck-2.PNG)
+
+![ip blck 3](ip-blck-3.PNG)
+
+## High Performance Computing (HPC)
+
+Cloud can support HPC easily as large compute resource can be launched in a
+snap. Resources can be added on demand and it follows a pay as you use model.
+
+### Data Management & Transfer
+
+- AWS Direct Connect
+  - move GB/s data to cloud over private secure network
+- snow family
+  - moving PB of data to cloud
+- AWS DataSync
+  - file system to cloud
+
+### Compute and Networking
+
+EC2 is the main discussion point
+
+- CPU/GPU optimized
+- spot instances/spot fleets + auto scaling
+- cluster placement group for networking
+- EC2 enhanced networking (SR-IOV)
+  - higher bandwidth, high packets per second, lower latency
+  - (new) Elastic Network Adapter (ENA) up to 100 Gbps
+  - (old) Intel 82599 up to 10 Gbps
+- Elastic Fabric Adapter (EFA)
+  - improved ENA for HPC, low latency and reliable, only linux
+  - great for internode communication/tightly coupled workloads
+  - leverages Messag Passing Interface (MPI) standard through bypassing OS
+
+### Storage
+
+- instance attached storage
+  - EBS: up to 256,000 IOPS with `io2`
+  - Instance store: up to millions of IOPS
+- network storage
+  - S3: large blob, not file system
+  - EFS: scaled IOPS with size or using provisioned IOPS
+  - FSx for Lustre: millions of IOPS backed by S3 
+
+### Automation and Orchestration
+
+- AWS Batch
+  - supports multi-node parallel jobs to run single job that spans multiple EC2
+  - easy to schedule jobs and launch EC2 instances
+- AWS ParallelCluster
+  - open source cluster management tool to deploy HPC on AWS
+  - configure with text file
+  - automate creation of VPC, subnet, cluster type and instance type
+  - ability to enable EFA on cluster to improve network performance
+
+## High Availability for EC2
+
+With CloudWatch + Lambda
+
+![ec2 ha 1](ec2-ha-1.PNG)
+
+Without CloudWatch/With ASG + user data to attach EIP (IAM role for attaching)
+
+![ec2 ha 2](ec2-ha-2.PNG)
+
+Using ASG's lifecycle hook
+
+![ec2 ha 3](ec2-ha-3.PNG)

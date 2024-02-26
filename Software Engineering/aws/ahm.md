@@ -113,6 +113,10 @@ archived events can be used for replay.
 EventBridge can analyze the event in bus and infer schema. Schema Registry
 allows to generate code for application and can be versioned.
 
+archive, replay events, reliable delivery
+
+intercept all api calls with cloud trail
+
 ### CloudWatch Insights
 
 #### Container

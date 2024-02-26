@@ -159,8 +159,12 @@ authenticated) pays for the network transfer.
 S3 events can be used for automation (simple filtering is allowed). Events
 created can be linked to other services and expect delays (seconds - minutes).
 Appropriate IAM permission must be granted on downstream services including
-lambda, SNS and SQS. S3 events can be limited (downstream service and
-filtering), thus using EventBridge might be an alternative.
+lambda, SNS and SQS. S3 events can be limited (downstream service and only
+filtering), thus using EventBridge might be an alternative. EventBridge allows
+advanced filtering options, integrates with mode downstream services and
+potentially multiple destinations. As many S3 events as desired can be created.
+S3 event notification usually is delivered in seconds however sometimes it can
+take a minute or longer.
 
 > S3 events can only have one event rule per perfix, use SNS to circumvent it
 

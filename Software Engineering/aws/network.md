@@ -363,8 +363,8 @@ A few options that can expose a lambda function to client
 
 > take note of the default API gateway timeout is independent of lambda's
 
-API gateway is a serverless option to create public accesssible REST api. A
-list of features including
+API gateway is a serverless option to create public accesssible REST api at
+regional level. A list of features including
 
 - WebSocker support
 - API versioning support

@@ -164,6 +164,8 @@ metric is computed for overall ASG instance.
 In the scaling policy there is a scaling cooldown that default to 300s to
 prevent scaling after scaling process completed/allow metric stabilization.
 
+> TODO lifecycle hook
+
 ## AWS Lambda
 
 A virtual, short executed (up to 15min) function that bills per call duration
