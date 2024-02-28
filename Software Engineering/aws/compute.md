@@ -3,10 +3,9 @@
 ## EC2
 
 Virtual machines for rent with full customization on OS, cpu, ram, network
-options, firewall rules and security groups.
-
-EC2 allows user to define boostrap script known as "EC2 user data" to run at
-instance launch that runs as `root` user.
+options, firewall rules and security groups. EC2 allows user to define boostrap
+script known as "EC2 user data" to run at instance launch that runs as `root`
+user.
 
 ### EC2 lifecycle
 
@@ -46,7 +45,7 @@ EC2 instance naming is intepreted as
 | name | short description | discount | cost | upfront payment |
 |-|-|-|-|-|
 | on demand | uninterupted short workload, predicted pricing by second | NA | highest | NA |
-| reserved (1/3 years) | reserves instance by attribute (os, type, region etc), convertible option for flexible instances, can be regional or zonal | ~72% or ~66% for convertible | yes |
+| reserved (1/3 years) | reserves instance by attribute (os, type, region etc), convertible option for flexible instances, can be regional or zonal | ~72% or ~66% for convertible | | yes |
 | savings plan (1/3 years) | commitment for usage e.g. $10/hour not instance type, exceeding is billed as on demand | ~72% savings | | no/partial/all upfront for various discounts |
 | spot instance | short workload, emphemeral | ~90% |
 | dedicated host | book entire physical server and placement, for compliance or server bound license | | highest, can be on demand or reserved |
@@ -58,7 +57,9 @@ EC2 instance naming is intepreted as
 Define a max spot price, a target capacity (instance, vCPU, ram) and per
 instance attributes, get instance when current price is less than defined max
 spot price. Instance is terminated or stopped when price is greater than
-defined max spot price with 2 minute grace period.
+defined max spot price with 2 minute grace period. Interruption refers to
+returning instance when AWS EC2 needs the capacity back in exchange for steep
+discounts.
 
 ![ec2 spt life](ec2-spt-lc.PNG)
 
@@ -77,7 +78,7 @@ Spot fleet allocation strategy
 
 - lowest price: from all pool
 - diversified: distributed from all pools (good for availability)
-- capacity optimized: poll with optimal capacity for number of instances
+- capacity optimized: pool with optimal capacity for number of instances
 - price capacity optimized: pool with highest capacity and then lowest price
 
 (deprecated) spot block to get reserved 1-6 hours without interruptions.
@@ -88,8 +89,8 @@ Controls inbound/outbound traffic in EC2 with only allow rules. Can be
 reference by IP (IPv4/v6) or another security group. Think if of as a port
 firewall (UFW). Inbound/outbound rules are edited separately. Security group
 can be one to many (resource) and limited to same VPC/peered VPC in same
-region. Security group are statefull, a traffic once allowed inbound/outbound
-is allowed on outbound/inbound.
+region. Security group are stateful, a traffic once allowed inbound/outbound is
+allowed on outbound/inbound.
 
 > when troubleshooting, timeout are usually good indicators of incorrect setup.
 
@@ -100,7 +101,7 @@ is allowed on outbound/inbound.
   - spread is for smaller number of EC2s
   - HA but not high performant (network cost)
   - one rack per instance
-- partition: spread instances across many partitions (racks) within AZ, up to hundreds of EC2 per group and up to 7 partion in AZ
+- partition: spread instances across many partitions (racks) within AZ, up to hundreds of EC2 per group and up to 7 partition in AZ
   - partition is more towards distributed systems e.g. kafka etc.
   - allows to launch in to specific partition
   - middle ground between HA, HPC and fault tolerance
@@ -164,7 +165,13 @@ metric is computed for overall ASG instance.
 In the scaling policy there is a scaling cooldown that default to 300s to
 prevent scaling after scaling process completed/allow metric stabilization.
 
-> TODO lifecycle hook
+#### ASG Lifecycle Hook
+
+![asg lc hook](asg-lc-hook.PNG)
+
+Lifecycle hook allows custom action for ASG to act when an instance moves into
+a wait state due to lifecycle hook with a grace period. Once it timeouts it
+transits to the next state, by default its an hour and can be extended.
 
 ## AWS Lambda
 
@@ -254,7 +261,7 @@ A few use case would be,
 - user prioritization
 - user tracking and analytics
 
-CloudFront Function
+## CloudFront Function
 
 ![cf fn](cf-fn.PNG)
 
@@ -268,7 +275,7 @@ CloudFront Function
 | - | author function in one region and CF replicates to all locations |
 | max execution time < 1ms | 5-10s |
 | max memory 2MB | 128MB - 10GB |
-| totalk package size 10kb | 1MB - 50MB |
+| total package size 10kb | 1MB - 50MB |
 | no network/file system access | network/file system access |
 | no access to request body | access to request body |
 | free tier available, 1/6 of lambda@edge | no free tier, charged per request & duration |

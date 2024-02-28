@@ -166,3 +166,11 @@ There is a free tier and a Business/Enterprise support plan for a full range of
 checks with api access using AWS support API.
 
 ## AWS X-Ray
+
+Service for developer to analyze and debug distributed application through logs
+collected from underlying services. It is an end to end view of requests and
+shows a map of as request is being handled. It relies on the SDK on the app or
+ECS task that communicates traces to X-Ray agent that forwards to AWS X-Ray
+service. Alternatively OpenTelemetry can be used. Dashboards that works similar
+to Splunk (Splunk QL) is provided. X-Ray group can be created for a subset of
+services and publish the notification when threshold is breached.

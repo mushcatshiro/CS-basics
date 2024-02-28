@@ -18,9 +18,11 @@ def read_file(file_name):
     data_list = data.split('\n\n')
     data_list = [data for data in data_list if (not data.startswith("#") and not data.startswith("```") and not data.startswith("!["))]
     data_list = [data for data in data_list if data != '']
-    data = " ".join([" ".join(data.split('\n')).replace("  ", " ") for data in data_list])
+    tmp = [" ".join(data.split('\n')).replace("  ", " ") for data in data_list]
+    line_count = len(tmp)
+    data = " ".join(tmp)
 
-    return data
+    return data, line_count
 
 def n_gram(data, n):
     """
@@ -32,9 +34,10 @@ def n_gram(data, n):
         n_gram_list.append(data_list[i:i+n])
     return n_gram_list
 
-def summary(n_gram_list, file_count):
+def summary(n_gram_list, file_count, line_count):
     print(f"Number of n-gram: {len(n_gram_list)}")
     print(f"Number of files: {file_count}")
+    print(f"Number of lines: {line_count}")
 
 def sample_questions(n_gram_list, question_count):
     if question_count == 0:
@@ -53,7 +56,7 @@ def sample_questions(n_gram_list, question_count):
 
 def main(path, n_gram_len, question_count):
     if os.path.isfile(path):
-        data = read_file(path)
+        data, line_count = read_file(path)
         file_count = 1
     elif os.path.isdir(path):
         data = ''
@@ -63,10 +66,12 @@ def main(path, n_gram_len, question_count):
             if file_name.endswith('.md') and not file_name in exclude_files:
                 fpath = os.path.join(path, file_name)
                 print(fpath)
-                data += read_file(fpath)
+                data, line_count = read_file(fpath)
+                data += data
+                line_count += line_count
                 file_count += 1
     n_gram_list = n_gram(data, n_gram_len)
-    summary(n_gram_list, file_count)
+    summary(n_gram_list, file_count, line_count)
     sample_questions(n_gram_list, question_count)
 
 
