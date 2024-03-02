@@ -70,7 +70,7 @@ same agent can be setup on on-prem servers.
 
 ### CloudWatch Alarms
 
-Used to trigger notifications any any metric with various options (%, max, min
+Used to trigger notifications for any metric with various options (%, max, min
 and etc) and 3 states (OK, INSUFFICIENT_DATA and ALARM). Period defines the
 length of time to evaluate the metric in multiple of 10 or 60 seconds.
 

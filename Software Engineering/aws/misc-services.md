@@ -112,6 +112,39 @@ accounts with high granularity (time and resource level). Provides savings plan
 to choose from for cost optimization. Usage can be forecast up to 12 months
 based on previous data points.
 
+## AWS Cost and Usage Report
+
+Provides most comprehensive set of cost and usage data in CSV format.
+Information are at very fine grained as compared to Cost Explorer. It can take
+up to 24 hours to generate the first report and daily (minimum) update of the
+report files.
+
+## AWS Budget
+
+Track and take action on AWS costs and usage. Allows to monitor aggregated
+utilization and coverage metrics for Reserved Instances/Savings Plan. Following
+type of budgets can be created
+
+- cost budgets: how much to spend on a service
+- usage budget: how much a service is used
+- RI coverage budgets: coverage threshold and receive alert when RI usage falls below
+- savings plan util budget: similar to RI but for util
+- savings converage budget: similar to RI but for converage
+
+Alerts and actions (e.g. restricted IAM policy to deny usage/provision) can be
+applied.
+
+## AWS Pricing Calculator
+
+Free web based planning tool to estimate cost of using AWS services.
+
+## AWS Outpost
+
+Fully managed service that extends AWS infra, services, API and tools to
+customer premises by providing local access to AWS managed infrastructure. It
+is a hardware device that customer can specify and delivered to customer's data
+center.
+
 ## AWS Batch
 
 Fully managed batch processing at any scale e.g. running 100,000 batch jobs on
