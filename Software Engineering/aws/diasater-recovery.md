@@ -90,7 +90,7 @@ prem.
   - gather information about on prem server to plan migration
   - server utilization and dependencies mappings
   - track with AWS Migration Hub
-- ![AWS DMS](database.md#database-migration-service)
+- [AWS DMS](database.md#database-migration-service)
 - AWS Server Migration Service
   - incremental replication of on prem live server to AWS
 

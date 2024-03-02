@@ -90,33 +90,6 @@ conditions. Complex composite alarms is possible to reduce noise.
 > testing CW Alarm can be done by manually setting alarm state to Alarm using
 > CLI commands
 
-### Amazon EventBridge
-
-> TODO: move it out as independent section with more details; similar to CW and
-> CT to get a better understanding of the services.
-
-rules:
-
-- can be used to schedule cron jobs (time based)
-- react to some event pattern
-
-It is the default event bus (routes events to zero or more destinations). There
-exists partner event bus to send events from AWS SaaS partners into AWS and an
-option to create custom event bus. Event buses can be accessed by other AWS
-accounts using resource-based policies. Events can be archive (optional
-filtering) sent to an event bus (indefinitely or some period retention). These
-archived events can be used for replay.
-
-> a use case for EventBridge resouce based policy is to enable all event in
-> an AWS organization to put the events to a single AWS account/region.
-
-EventBridge can analyze the event in bus and infer schema. Schema Registry
-allows to generate code for application and can be versioned.
-
-archive, replay events, reliable delivery
-
-intercept all api calls with cloud trail
-
 ### CloudWatch Insights
 
 #### Container

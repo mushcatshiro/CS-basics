@@ -610,6 +610,13 @@ always the option to choose.
 > when using CLI to do a `aws s3 ls` it might not return results despite
 > correct setup of endpoint as CLI's default region is `us-east-1`.
 
+### AWS Privatelink
+
+Provides private connectivity between VPC, supported AWS services and on-prem
+network without exposing traffic to public internet. No Internet GateWay, NAT
+device, public IP address, AWS DX connection or S2S VPN needed to allow
+communication with the service from private subnets.
+
 ### VPC FLow Logs
 
 Log that capture information about IP traffic going into interfaces including

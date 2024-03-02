@@ -141,3 +141,49 @@ and ActiveMQ. The scalability is not as good as SQS/SNS however is still
 possible to run in multi-AZ with failover. The failover is done through having
 an active and a standby MQ that both mounted to same EFS storage. Offers queue
 and topic feature.
+
+## Amazon EventBridge
+
+Serverless event bus service to connect applications and delivers a stream of
+real tim edata to AWS services and more. Routing rules can be setup to
+determine where to send data to enable loosely coupled event driven
+architecture.
+
+rules:
+
+- can be used to schedule cron jobs (time based)
+- react to some event pattern
+
+It is the default event bus (routes events to zero or more destinations). There
+exists partner event bus to send events from AWS SaaS partners into AWS and an
+option to create custom event bus. Event buses can be accessed by other AWS
+accounts using resource-based policies. Events sent to an event bus can be
+archive (optional filtering) indefinitely or some period retention. These
+archived events can be used for replay.
+
+> a use case for EventBridge resouce based policy is to enable all event in
+> an AWS organization to put the events to a single AWS account/region.
+
+Pipes also exists and is intended for point to point integration i.e. receives
+events from single source for processing and delivery to single target. Pipes
+and buses are used together by creating a pipe with event bus as its target.
+(similar to SQS+SNS)
+
+EventBridge can analyze the event in bus and infer schema. Schema Registry
+allows to generate code for application and can be versioned for all AWS
+services.
+
+Application's availability can be improved with EventBridge Global Endpoints
+without additional costs. First assign R53 health check to the endpoint.
+When failover initiated, the health check reports unhealthy state. Within
+minutes of failover initiation, custom events are routed to an event bus in the
+secondary region and processed by that event bus. Once the health check reports
+healthy state event are processed in the primary region.
+
+Event can failed to be delivered to target specified (target resource
+unavailable, insufficient permission or network condition). EventBridge allows
+retries (number of retry and etc in retry policy, default retry for 24 hours
+and up to 185 times with exponential backoff/randomized delay) and if it still
+fails it drops the event or sends to a dead letter queue (SQS).
+
+intercept all api calls with cloud trail
