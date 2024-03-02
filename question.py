@@ -8,7 +8,9 @@ import random
 exclude_files = [
     "amzn.md",
     "myassistant.md",
-    "role.md"
+    "role.md",
+    "serverless.md",
+    "chatgpt-qns.md"
 ]
 
 def read_file(file_name):
@@ -44,21 +46,26 @@ def n_gram(data, n):
         n_gram_list.append(data_list[i:i+n])
     return n_gram_list
 
-def summary(n_gram_list, file_count, line_count):
+def summary(n_gram_list, file_count, line_count, question_count):
     print(f"Number of n-gram: {len(n_gram_list)}")
     print(f"Number of files: {file_count}")
     print(f"Number of lines: {line_count}")
+    print(f"Number of questions: {question_count}")
 
-def sample_questions(n_gram_list, question_count):
+def sample_questions(n_gram_list, question_count, file_count, line_count, ranomize=False):
     if question_count == 0:
-        question_count = len(n_gram_list) // 10
+        question_count = line_count // 10
+    summary(n_gram_list, file_count, line_count, question_count)
     questions = []
-    for i in range(question_count):
-        n_gram = random.choice(n_gram_list)
-        questions.append(" ".join(n_gram))
+    # random int from 0 to len(n_gram_list)
+    l: list = random.sample(range(len(n_gram_list)), question_count)
+    l = sorted(l)
+    for i in l:
+        questions.append(" ".join(n_gram_list[i]))
     # print(json.dumps(questions, indent=2))
     # randomize the questions
-    random.shuffle(questions)
+    if ranomize:
+        random.shuffle(questions)
     for i, question in enumerate(questions):
         print(f"Question {i+1}: {question}")
         input("Press Enter for next question")
@@ -82,8 +89,7 @@ def main(path, n_gram_len, question_count):
                 line_count += _line_count
                 file_count += 1
     n_gram_list = n_gram(data, n_gram_len)
-    summary(n_gram_list, file_count, line_count)
-    sample_questions(n_gram_list, question_count)
+    sample_questions(n_gram_list, question_count, file_count, line_count)
 
 
 if __name__ == '__main__':

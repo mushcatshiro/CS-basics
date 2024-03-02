@@ -253,3 +253,33 @@ Without CloudWatch/With ASG + user data to attach EIP (IAM role for attaching)
 Using ASG's lifecycle hook
 
 ![ec2 ha 3](ec2-ha-3.PNG)
+
+## Well Architected Framework
+
+Six pillar
+
+- operational excellence
+  - monitoring systems, continually improving
+  - automating changes, responding to events and defining standards to manage operations
+- security
+  - proctecting information and systems
+  - data confidentiality and integrity
+  - user permission
+  - establish control to detect security events
+- reliability
+  - workload to perform intended function
+  - recovery from failure quickly to meet demand
+  - distributed system design, recovery planning
+  - adapting to changing requirements
+- performance efficiency
+  - structered and streamlined allocation of resources
+  - right resource type and size for the requirement
+  - maintaining efficiency as business evolve
+- cost optimization
+  - avoiding unnecessary costs
+  - understand spending over time and control fund allocation
+  - select resource of right type and quantity
+  - scale to meet business without overspending
+- sustainability
+  - minimize environmental impact of running cloud workloads
+  - understand and reduce impact, maximize utilization and minimize required resource

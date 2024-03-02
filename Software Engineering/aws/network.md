@@ -23,7 +23,7 @@ eth1: flags=4099<UP,BROADCAST,MULTICAST>  mtu 1500 (secondary ENI)
 
 ENI can be create independently and connected to instance on the fly. It can be
 used as network failover. Manual created ENI persist when instance is
-terminated.
+terminated. Multiple ENI on single EC2 is possible.
 
 ## Elastic Load Balancer (ELB)
 

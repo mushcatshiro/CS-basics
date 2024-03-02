@@ -40,8 +40,12 @@ when a failover happens.
 > serve read traffic.
 
 A combination of read replica and multi AZ can be used to gether to have a 1 +
-1 (backup) + 15 read replica RDS cluster. A multi region deployment read
-replica is used as failover **????
+1 (backup) + 15 read replica RDS cluster. A cross region deployment read
+replica can be used as failover.
+
+> cross region read replica when creating can results in I/O distruption
+> ~ minutes as it takes a snapshot of the source database (can be another
+> multi AZ read replica).
 
 It is possible for RDS to be promoted from single AZ to multi AZ with no
 downtime by modifying the database option. RDS will take a snapshot of database
