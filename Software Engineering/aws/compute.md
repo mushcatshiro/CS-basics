@@ -44,7 +44,7 @@ EC2 instance naming is intepreted as
 
 | name | short description | discount | cost | upfront payment |
 |-|-|-|-|-|
-| on demand | uninterupted short workload, predicted pricing by second | NA | highest | NA |
+| on demand | uninterupted short workload, predictable pricing by second | NA | highest | NA |
 | reserved (1/3 years) | reserves instance by attribute (os, type, region etc), convertible option for flexible instances, can be regional or zonal | ~72% or ~66% for convertible | | yes |
 | savings plan (1/3 years) | commitment for usage e.g. $10/hour not instance type, exceeding is billed as on demand | ~72% savings | | no/partial/all upfront for various discounts |
 | spot instance | short workload, emphemeral | ~90% |

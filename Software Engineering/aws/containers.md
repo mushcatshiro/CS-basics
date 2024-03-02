@@ -7,9 +7,9 @@ clusters i.e. `tasks = containers`.
 
 For EC2 launch type, EC2 instances are launched within the ECS clusters. These
 EC2 instances are manually provisioned and maintained. ECS agent must be
-installed on it. With that AWS will take care of starting and stopping tasks
-in the EC2 instances. ASG is required to be defined when setting up ECS
-cluster. The ASG scaling can be done based on,
+installed on it unless it is an ECS optimized AMI. With that AWS will take care
+of starting and stopping tasks in the EC2 instances. ASG is required to be
+defined when setting up ECS cluster. The ASG scaling can be done based on,
 
 - CPU util
 - add EC2 over time

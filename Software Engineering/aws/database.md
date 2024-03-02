@@ -17,7 +17,7 @@ Auto scaling of RDS can be setup such that the storage increase dynamically by
 setting a maximum storage threshold e.g. free storage is < 10% of provisioned
 storage. Auto scaling is suitable for unpredictable workloads.
 
-Custom RDS option is only for Oracle and MySQL. They are same tto the non
+Custom RDS option is only for Oracle and MySQL. They are same to the non
 custom option with additional ability to choose OS and SSH to machine.
 
 #### RDS read replica and Multi AZ
@@ -90,8 +90,8 @@ of volumnes.
 Aurora provides a writer endpoint DNS for master and a reader endpoint DNS with
 connection load balancer. Custom endpoints can be created for different use
 cases e.g. OLAP etc. When custom endpoints is used, the default reader endpoint
-should not be used. With custom enpoints that is meant for OLAP more powerful
-machine can be used.
+should not be used. With custom enpoints, more powerful machine can be used
+for OLAP.
 
 Aurora's replica auto scaling can be done through metric monitoring e.g. cpu
 usage and creates more read replica under the same reader endpoint.
@@ -111,8 +111,8 @@ read replica is possible. Promoting another region for disaster recovery has an
 RTO of < 1 minute.
 
 > Aurora cross region replication and Aurora global database's difference is
-> Aurora global database uses physical level replication while the prior uses
-> logical level replication.
+> Aurora global database uses physical level replication (block replication)
+> while the prior uses logical level replication (MySQL binlog).
 
 ##### Aurora Database Clonning
 
@@ -170,7 +170,7 @@ limit for item size. Data types supported are
 - document type: list, map
 - set type: string set, number set, binary set
 
-> it is great for rapidly evolving schemas
+> it is great for rapidly/ever evolving schemas
 
 The primary key is made of a partition key and sort key (optional).
 
@@ -186,8 +186,6 @@ On-Demand Mode:
 - no capacity planning
 - pay per use and is much expensive
 - good for unpredictable workload
-
-> keyword: ever evolving schema
 
 DynamoDB has a TTL feature which delete items that expires from the timestamp.
 TTL is an attribute in epoch time format and it is usually used for keeping
@@ -392,7 +390,7 @@ SQL supports join, sql query statements.
 - strong schema? flexibility? reporting? search? rdbms/nosql?
 - license cost? cloud native aurora?
 
-## Database Migration Service
+## Database Migration Service (DMS)
 
 A quick and secure database migration to AWS service which is also resilient
 and have have self healing capabilities. Source database will be available
