@@ -7,7 +7,7 @@ use random public IP + DNS or load balancer with no public IP at all.
 
 ## Simple Web App
 
-![arch 1](arch-1.PNG)
+![arch 1](../static/arch-1.PNG)
 
 If ELB is used alias record is suitable, if user is directly hitting public
 EC2 instance A record will do the job (with R53).
@@ -16,9 +16,9 @@ ASG can further improved by having multi AZ deployment -> high availability
 
 Reserve capacity for cost optimization + on demand
 
-### With Database
+### With Database/Cache
 
-![arch 2](arch-2.PNG)
+![arch 2](../static/arch-2.PNG)
 
 User information is stored in client browser with ELB sticky session. Note if
 EC2 instance is terminated, the user session will be invalid.
@@ -29,7 +29,7 @@ as server side session. This is useful if user cookie is > 4kb.
 
 alternatively,
 
-![arch 3](arch-3.PNG)
+![arch 3](../static/arch-3.PNG)
 
 EFS with multiple ENIs (bound to AZ, one per AZ). Similarly EBS works however
 with a catch that its also bounded to AZ and connecting to instance might not
@@ -59,7 +59,7 @@ and high availability with load balancer for prod.
 BeanStalk is made up of 3 components,
 
 - application: collection of BeanStalk components (envs, versions, configs,...)
-- applicaiton version
+- application version
 - environment(s)
   - collection of AWS resource (only one application at a time)
   - tiers (web/worker)
@@ -72,19 +72,19 @@ With EventBridge, fully serverless architecture for image processing.
 
 Event based
 
-![ecs 1](ecs-1.PNG)
+![ecs 1](../static/ecs-1.PNG)
 
 or schedule based
 
-![ecs 2](ecs-2.PNG)
+![ecs 2](../static/ecs-2.PNG)
 
 With SQS
 
-![ecs 3](ecs-3.PNG)
+![ecs 3](../static/ecs-3.PNG)
 
 Combining both SNS and EventBridge
 
-![ecs 4](ecs-4.PNG)
+![ecs 4](../static/ecs-4.PNG)
 
 ## Serverless
 
@@ -99,7 +99,7 @@ Requirements
 - user can read/write but mainly read
 - database should scale and have high read throughput
 
-![arch 4](arch-4.PNG)
+![arch 4](../static/arch-4.PNG)
 
 ### serverless architecture 2
 
@@ -110,7 +110,7 @@ Requirements
 - welcome email for new users
 - thumbnail generated for all photo uploaded
 
-![arch 5](arch-5.PNG)
+![arch 5](../static/arch-5.PNG)
 
 ## Microservice
 
@@ -120,7 +120,7 @@ Requirements
 - each service's architecture may vary in form and size
 - a microservice architecture with leaner development lifecycle
 
-![arch 6](arch-6.PNG)
+![arch 6](../static/arch-6.PNG)
 
 > note the above is a synchronous pattern, async can be applied with SQS,
 > Kinesis, lambda triggers (S3) and etc
@@ -130,7 +130,7 @@ Requirements
 EC2 that distributes software update, lots of request when ned update is out.
 Prefers minimum changes to application but would like to optimize cost and CPU.
 
-![arch 7](arch-7.PNG)
+![arch 7](../static/arch-7.PNG)
 
 Network cost and ASG is minimized and the updates are cached at edge.
 
@@ -145,37 +145,37 @@ requirements
 - report created using queries should be in S3
 - data to be loaded into warehouse and create dashboards
 
-![arch 8](arch-8.PNG)
+![arch 8](../static/arch-8.PNG)
 
 ## S2S VPN Connection as Backup
 
-![dx s2s](dx-s2s.PNG)
+![dx s2s](../static/dx-s2s.PNG)
 
 ## Shared DX Between Multiple Accounts
 
-![dx mul](dx-mul.PNG)
+![dx mul](../static/dx-mul.PNG)
 
 ## Event Processing
 
-![arch evnt 1](arch-evnt-1.PNG)
+![arch evnt 1](../static/arch-evnt-1.PNG)
 
 Note that the dead letter queue and lambda retry mechanism difference.
 
 ### Fan Out Pattern
 
-![arch evnt 2](arch-evnt-2.PNG)
+![arch evnt 2](../static/arch-evnt-2.PNG)
 
 ### CloudTrail Event
 
-![arch evnt 3](arch-evnt-3.PNG)
+![arch evnt 3](../static/arch-evnt-3.PNG)
 
 ### API Gateway and KDS
 
-![arch evnt 4](arch-evnt-4.PNG)
+![arch evnt 4](../static/arch-evnt-4.PNG)
 
 ## Caching Strategies
 
-![arch cache](arch-cache.PNG)
+![arch cache](../static/arch-cache.PNG)
 
 > S3 and database has no caching abilities
 
@@ -183,11 +183,11 @@ Note that the dead letter queue and lambda retry mechanism difference.
 
 Depending on the infrastructure, different means might fail.
 
-![ip blck 1](ip-blck-1.PNG)
+![ip blck 1](../static/ip-blck-1.PNG)
 
-![ip blck 2](ip-blck-2.PNG)
+![ip blck 2](../static/ip-blck-2.PNG)
 
-![ip blck 3](ip-blck-3.PNG)
+![ip blck 3](../static/ip-blck-3.PNG)
 
 ## High Performance Computing (HPC)
 
@@ -217,7 +217,7 @@ EC2 is the main discussion point
 - Elastic Fabric Adapter (EFA)
   - improved ENA for HPC, low latency and reliable, only linux
   - great for internode communication/tightly coupled workloads
-  - leverages Messag Passing Interface (MPI) standard through bypassing OS
+  - leverages Message Passing Interface (MPI) standard through bypassing OS
 
 ### Storage
 
@@ -244,15 +244,15 @@ EC2 is the main discussion point
 
 With CloudWatch + Lambda
 
-![ec2 ha 1](ec2-ha-1.PNG)
+![ec2 ha 1](../static/ec2-ha-1.PNG)
 
 Without CloudWatch/With ASG + user data to attach EIP (IAM role for attaching)
 
-![ec2 ha 2](ec2-ha-2.PNG)
+![ec2 ha 2](../static/ec2-ha-2.PNG)
 
 Using ASG's lifecycle hook
 
-![ec2 ha 3](ec2-ha-3.PNG)
+![ec2 ha 3](../static/ec2-ha-3.PNG)
 
 ## Well Architected Framework
 

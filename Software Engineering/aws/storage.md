@@ -18,6 +18,8 @@ snapshot with no latency on first use/creation forcefully.
 
 ### EBS Volume Type
 
+> HDD can not be used as boot disk, instance store can
+
 | name | short description | IOPS | use case | size |
 |-|-|-|-|-|
 | gp2/gp3(ssd) | balance price to performance | see below | - | 1 - 16 TB |
@@ -60,7 +62,7 @@ filesytem. EFS files are encrypted with KMS.
 EFS can scale to thousands of NFS clients, with ~10 GB/s throughput and grows
 into PB size storage. Performance option is available at creation time to have
 maximum I/O with high latency, high throughput and highly parallel (compared to
-default latency sensitive mode).
+default latency sensitive mode). One use case will be for big data processing.
 
 Throughput option is available with bursting capabilities, provisioned
 throughput i.e. fixed value regardless of storage size and elastic mode which
@@ -126,6 +128,9 @@ than 5GB to use multi-part upload. Each object has,
   - mainly used to prevent unintended delete and version control (roll back)
   - files prior to versioning enabled will have version null
   - suspeding versioning will not delete pervious version
+  - once enabled cannot be disabled only suspended
+
+> inbound traffic to S3 is free
 
 ### S3 Bucket Replication
 
@@ -139,6 +144,8 @@ Some use case for the two replication mode,
 
 - CRR: compliance, low latency access, replication cross account
 - SRR: log aggregation, live replication between test and prod environment
+
+> S3 has a sync command that checks before copying files over
 
 When deleting an object with no version specified, a delete marker is attached.
 However when deleting an object with version specified, that particular version
@@ -199,6 +206,8 @@ A few tips on S3 performance optimization including
   - must use for file > 5GB
 - S3 transfer acceleration
   - improve speed by xfering to AWS edge location and forward data to S3 bucket in target region
+  - only pay for accelerated transfers
+  - not for copy objects as it is a bucket level feature
 - byte range fetch: speed up download or retrieve only specific data
   - parallel get for specific byte range
   - resilient to failures
@@ -226,10 +235,13 @@ between classes is the availability.
 Lifecycle rules can be setup to move object between storage tiers. There are
 two types of actions,
 
-- transition action: move object from class A to class B after X days (entire objec)
+- transition action: move object from class A to class B after X days (entire object)
+  - standard to standard IA or one zone IA requries to wait for 30 days
+  - a minimum 30 days storage charge for std IA and one zone IA
+  - S3 PUT to glacier zero day policy is possible
 - expiration action: delete object after X days 
   - only current version
-  - to delete old version of files if versioning enabled
+  - manual old version of files if versioning enabled
   - delete incomplete multipart upload
 
 Rules can be created for certain prefix of S3 bucket name or tags
@@ -246,7 +258,7 @@ encryptions. Client side encryption is also possible but has to be managed at
 client side.
 
 - SSE-S3
-  - AWS256 encrypted
+  - AES256 encrypted
   - request must have header "x-amz-server-side-encryption": "AES256"
 - SSE-KMS
   - under controlled key (stored in AWS)
@@ -279,34 +291,37 @@ With the policies above, it is possible to grant public access, or force object
 to be encrypted at upload, or grant access to another account (cross account).
 
 > naming convention including only lowercase, no underscore, 3-63 characters
-> long, not an IP, start with alphanum, must not start with xn- prefix and
-> -s3alias suffix.
+> long, not an IP, start with alphanum, must not start with `xn-` prefix and
+> `-s3alias` suffix.
 
- S3 has an option to enable MFA delete for permanently deleting an object
- version or suspending versioning on a bucket. List deleted version/enable
- versioning does not require MFA. Versioning must first be enabled before MFA
- delete is enabled and enablement requires bucket owner (root account).
+S3 has an option to enable MFA delete for permanently deleting an object
+version or suspending versioning on a bucket. List deleted version/enable
+versioning does not require MFA. Versioning must first be enabled before MFA
+delete is enabled and enablement requires bucket owner (root account).
 
- S3 access logs can be enabled for audit purposes. All incoming request will be
- logged into another S3 bucket in the same region. Infinite loop is be created
- if the monitored bucket is set as the logging bucket.
+S3 objects are owned by the account that uploads it, even if the bucket is in a
+different account.
 
- S3 can generate pre-signed urls such that the IAM permission is shared to
- another user with the url (with exipry). A few use cases including
+S3 access logs can be enabled for audit purposes. All incoming request will be
+logged into another S3 bucket in the same region. Infinite loop is be created
+if the monitored bucket is set as the logging bucket.
+
+S3 can generate pre-signed urls such that the IAM permission is shared to
+another user with the url (with exipry). A few use cases including
 
  - sharing/upload some files without changing bucket to public
  - ever changing user list
  - premium media download
 
- S3 access point can help to simplify security management for S3 buckets. It
- masks off the buckets and only user through any access point to access a
- subset of buckets. Each access point has a DNS name (internet or VPC origin).
- Access point is controlled by access point policy.
+S3 access point can help to simplify security management for S3 buckets. It
+masks off the buckets and only user through any access point to access a
+subset of buckets. Each access point has a DNS name (internet or VPC origin).
+Access point is controlled by access point policy.
 
- For VPC origin access point, a VPC endpoint must be created to access with
- VPC endpoint policy allow access to target bucket and access point.
+For VPC origin access point, a VPC endpoint must be created to access with
+VPC endpoint policy allow access to target bucket and access point.
 
-### S3 Locks
+### Locks
 
 Glacier has an glacier vault lock option adopts a Write Once Read Many model by
 creating a vault lock policy. The vault lock prevents object from future edits
@@ -325,7 +340,12 @@ There are two modes,
 Retention period must be set for both modes and can be extended. There is also
 legal hold option that protect object (version) indefinitely and is independent
 from retention period. IAM permission is required to place and remove legal
-hold.
+hold. Retention period is for bucket level.
+
+Object level retention is possible to specify a `Retain Until Date`. If
+versioining is enabled a specific version can be specified on. This is achieved
+by updating objects metadata. Different version can have a different retention
+period. Object level retention overrides bucket default retention.
 
 ### S3 Object Lambda
 
@@ -339,6 +359,11 @@ Use cases
 - masking personal identifiable information
 - converting file formats
 - resizing images on the fly
+
+## S3, EFS and EBS a price comparison
+
+EFS pricing is $0.3 per GB per month; EBS (gp2) charges $0.1 per GB month
+provisioned and S3 charges $0.023 per GB per month.
 
 ## AWS Snow Family
 
@@ -382,8 +407,8 @@ The device provides block storage and S3 compatible object storage.
   - 104 vCPU, 416GB RAM, optional GPU
   - storage clustering up to 16 nodes
 
-There is no direct pipeline for snowball to glacier however it can be done by
-using lifecycle policy on the S3 bucket.
+> There is no direct pipeline for snowball to glacier however it can be done by
+> using lifecycle policy on the S3 bucket.
 
 ### Snowcone (SSD)
 
@@ -411,10 +436,10 @@ be installed on local machine.
 
 [choosing fsx](https://aws.amazon.com/fsx/when-to-choose-fsx/)
 
-FSx is a service to launch fully managed 3rd party filessystem on AWS. FSx only
+FSx is a service to launch fully managed 3rd party file system on AWS. FSx only
 supports lustre, Netapp ONTAP, Windows File Server and OpenZFS.
 
-FSx for Windows supports,
+### FSx for Windows
 
 - SMB protocol and Windows NTFS
 - msft Active Directory, ACL, user quotas
@@ -428,7 +453,7 @@ FSx for Windows supports,
 - can be configured as Multi-AZ for high availability
 - daily backup to S3
 
-FSx for Lustre
+### FSx for Lustre
 
 - parallel distributed file system for large-scale computing (ML/HPC)
   - video processing, financial modeling, Electronic Design Automation
@@ -451,11 +476,11 @@ FSx for Lustre
     - replace failed files within minutes
     - long term processing/sensitive data
 
-![fsx-lustre](fsx-lustre.PNG)
+![fsx-lustre](../static/fsx-lustre.PNG)
 
 > only difference is if its persistent, it has replication in same AZ
 
-NetApp ONTAP
+### NetApp ONTAP
 
 - file system compatible with NFS, SMB, iSCSI protocol
 - move work load on ONTAP or NAS to AWS
@@ -464,7 +489,7 @@ NetApp ONTAP
 - snapshot, replication, low-cost, compression and data deduplication
 - PITR instantaneous cloning (helpful for testing new workloads)
 
-OpenZFS
+### OpenZFS
 
 - only compatible with NFS (v3, v4, v4.1, v4.2)
 - move workload on ZFS to AWS
@@ -479,26 +504,26 @@ A bridge between on prem data and cloud data for disaster recovery, backup &
 restore, tiered storage, on prem cache and low latency file access. There is an
 option to get hardware appliance for the gateways from AWS.
 
-S3 file GW caches the most trecently used data at the file GW. Bucket access
-uses IAM roles for each file GW. SMB protocol has integration with Active
+S3 file Gateway caches the most trecently used data at the file Gateway. Bucket
+access uses IAM roles for each file GW. SMB protocol has integration with Active
 Directory for user authentication.
 
-![file-gw](file-gw.PNG)
+![file-gw](../static/file-gw.PNG)
 
-FSx file GW allows native access to AWS FSx for windows file server and caches
-frequently accessed data. It has native windows compatibility (SMB, NTFS, AD).
-AWS FSx works without the gateway however does not caches data. Its useful for
-group file share and home directories.
+FSx file Gateway allows native access to AWS FSx for windows file server and
+caches frequently accessed data. It has native windows compatibility (SMB, NTFS
+, AD). AWS FSx works without the gateway however does not caches data. Its
+useful for group file share and home directories.
 
-Volume GW is a block storage using iSCSI protocol backed by S3 and is further
-backed by EBS snapshots for quick restore.
+Volume Gateway is a block storage using iSCSI protocol backed by S3 and is
+further backed by EBS snapshots for quick restore.
 
 - cached volume: low latency access to most recent data
 - stored volume: dataset on prem and scheduled backups to S3
 
-Tape GW for physical tape backup process to be backup on cloud using Virtual
-Tape Library backed by AWS S3 and Glacier. Backup data is using existing tape
-based process and iSCSI interface.
+Tape Gateway for physical tape backup process to be backup on cloud using
+Virtual Tape Library backed by AWS S3 and Glacier. Backup data is using existing
+tape based process and iSCSI interface.
 
 ## AWS Transfer Family
 
@@ -510,7 +535,7 @@ credentials within the service and it integrates with existing authentication
 systems (msft AD, LDAP, Amazon Cognito, custom). Uses cases including sharing
 files, public datasets, CRM and ERP.
 
-![xfer-fam](xfer-fam.PNG)
+![xfer-fam](../static/xfer-fam.PNG)
 
 ## AWS DataSync
 

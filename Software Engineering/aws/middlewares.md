@@ -25,7 +25,10 @@ FIFO queue is available that guarantees message ordering but has a limited
 throughput of 300 messages/s without batching and 3000 msg/s with batching. It
 also guarantees exact once delivery by removing duplicates. SQS FIFO queue has
 a message group features such that each consumer can request for a batch of
-messages within the same message queue to be processed.
+messages within the same message queue to be processed. FIFO queue **must** end
+with suffix `.fifo` and it counts to the 80 character limit of queue name.
+
+> 3000 msg/s is done by batching 10 messages together which is also the max
 
 SQS can be used a buffers to database write when the traffic is high. It helps
 decoupling the write operation to database from the application request.
@@ -84,7 +87,7 @@ data in real time.
 
 ### Kinesis Data Stream
 
-![kds](kds.PNG)
+![kds](../static/kds.PNG)
 
 > Number of shards is defined and provisioned ahead of time that serves as
 > stream capacity.
@@ -93,7 +96,10 @@ For each incoming records there is a partition key and data blob up to 1MB at
 1MB/s or 1000 message/s per shard. For each outgoing records there is a
 partition key, sequence number and data blob. The outgoing records can be
 consumed at 2MB/s per shard for all consumers or 2MB/s per shard per consumer
-(enchanced/push data).
+(enchanced/push data) if multiple consumers retrieving data form a stream in
+parallel.
+
+> KDS can not output directly to S3
 
 KDS is a real time regional level streaming service with retention of 1-365
 days. It has the ability to replay and is immutable (once inserted and cant be
@@ -109,19 +115,32 @@ deleted). All data that shares the same partition goes to the same shard
   - default provisioned 4MB/s in or 4000 records per second
   - pay per stream per hour and data in/out per GB
 
+Number of consumers for KDS is limited by 20 (enhanced fanout limit) per shard.
+Default of shards per AWS account is around 500. When needed unlimited consumer
+ordered message middleware, SQS FIFO is the choice to go.
+
 Security is managed through IAM authorization/access control, HTTPS in flight
 encryption, KMS at rest encryption, client side encryption is possible, VPC
 endpoints available to access within VPC and monitoring through CloudTrail.
 
+KDS are recommended for the following situations
+
+- routing related record to same processors
+- ordering records
+- ability for multiple application to consume same stream concurrently
+- ability to consume records in same order few hours later
+
 ### Kinesis Data Firehose
 
-![kdf](kdf.PNG)
+![kdf](../static/kdf.PNG)
 
 Fully managed auto scaling serverless ingestion service. Pay as data going
 through firehose pricing model. It is near real time (60s latency minimum for
 non full batches or minimum 1MB of data at a time). Good support for many data
 formats, conversion/transformation/compression. Custom transformation with
-lambda is also possible.
+lambda is also possible. When set KDS as the source of KDF, KDS's `PutRecord`
+and `PutRecordBatch` operations are diabled and Kinesis Agent cannot write to
+KDF.
 
 ## Kinesis, SQS and SNS
 
@@ -145,7 +164,7 @@ and topic feature.
 ## Amazon EventBridge
 
 Serverless event bus service to connect applications and delivers a stream of
-real tim edata to AWS services and more. Routing rules can be setup to
+real time data to AWS services and more. Routing rules can be setup to
 determine where to send data to enable loosely coupled event driven
 architecture.
 
@@ -186,4 +205,4 @@ retries (number of retry and etc in retry policy, default retry for 24 hours
 and up to 185 times with exponential backoff/randomized delay) and if it still
 fails it drops the event or sends to a dead letter queue (SQS).
 
-intercept all api calls with cloud trail
+intercept all api calls with cloudtrail

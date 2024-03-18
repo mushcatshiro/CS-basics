@@ -1,4 +1,4 @@
-# database
+# Database
 
 ## Relational Database
 
@@ -13,7 +13,7 @@ allowed. RDS's maintenance will results in some downtime.
 
 > provisioned RDS instance size and EBS volume type/size to be specified.
 
-Auto scaling of RDS can be setup such that the storage increase dynamically by
+Autoscaling of RDS can be setup such that the storage increase dynamically by
 setting a maximum storage threshold e.g. free storage is < 10% of provisioned
 storage. Auto scaling is suitable for unpredictable workloads.
 
@@ -49,7 +49,9 @@ replica can be used as failover.
 
 It is possible for RDS to be promoted from single AZ to multi AZ with no
 downtime by modifying the database option. RDS will take a snapshot of database
-and restore it in a new AZ and run a sync between two instance.
+and restore it in a new AZ and run a sync between two instance. RDS snapshots
+are stored in S3 buckets however is not accessible to users (AWS managed).
+To share the snapshot, allows access to KMS to the party that need access.
 
 #### RDS Event Notification
 
@@ -203,7 +205,7 @@ congestion by caching and allows microseconds latency for cached data. No
 application logic modification needed (compatible to Dynamodb APIs). Default
 TTL of 5 minutes.
 
-![dax ddb cache](dax-ddb-cache.PNG)
+![dax ddb cache](../static/dax-ddb-cache.PNG)
 
 DAX is good for individual object cache or database scan and query while
 ElastiCache is good for aggregated results (computation intensive ). DAX and
@@ -225,7 +227,7 @@ Ordered stream of item level modification (create/delete/update) in table for
 | limited number of consumers | high number of consumers |
 | lambda, DynamoDB Stream Kinesis Adapter | lambda, KDA, KDF, Glue streaming ETL |
 
-![ddb strm](ddb-strm.PNG)
+![ddb strm](../static/ddb-strm.PNG)
 
 #### DynamoDB Global Tables
 
@@ -403,6 +405,8 @@ during the migration. The service supports
 - homogeneous migration e.g oracle to oracle
 - heterogeneous migration e.g. mssql to Aurora
 
+Most of the AWS and open source database are supported except for DDB,
+Opensearch and KDS. Also it supports data replication to EC2 instance and KDS.
 It supports continuous data replication with change data capture (CDC). DMS
 replies user to create an EC2 instance to perform replication tasks. AWS offers
 a Schema Convertion Tool (SCT) in case the target and source database are using
@@ -428,7 +432,7 @@ of having redundancy, eliminates I/O freeze and minimize latency spikes.
 
 > use DMS if both database are up and running
 
-![cont repl](cont-repl.PNG)
+![cont repl](../static/cont-repl.PNG)
 
 ## MISC
 

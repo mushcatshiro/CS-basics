@@ -31,7 +31,7 @@ Two key metric to look at are
 - high RPO implies more data loss
 - only data storage cost
 
-![bu res](bu-res.PNG)
+![bu res](../static/bu-res.PNG)
 
 ### Pilot Light
 
@@ -40,25 +40,25 @@ Similar to backup and restore, but slightly faster as the critical core is
 already up. Some additional cost for running the critical core (e.g. RDS below)
 and when disaster happen R53 will failover + bring up EC2.
 
-![p l](p-l.PNG)
+![p l](../static/p-l.PNG)
 
 ### Warm Standby
 
 Having a full system up and running at minimum size. Similar to Pilot Light
 upon disaster system is scaled up to production load.
 
-![w s](w-s.PNG)
+![w s](../static/w-s.PNG)
 
 ### Hot Site/Multi Site Approach
 
 Very low RTO and very expensive by having full production scale on AWS and on
 prem.
 
-![m s](m-s.PNG)
+![m s](../static/m-s.PNG)
 
 ### AWS Multi Region
 
-![aws a r](aws-a-r.PNG)
+![aws a r](../static/aws-a-r.PNG)
 
 ## Disaster Recovery High Level Overview
 

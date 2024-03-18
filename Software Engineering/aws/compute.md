@@ -28,6 +28,13 @@ Relaunch a stopped instance will results in change of external IP address.
 EC2 instance naming is intepreted as
 `{instance class}{generation}.{size within instance class}` e.g. `M2.2xLarge`.
 
+#### Status Check
+
+Helps to determine if EC2 has any problem that prevent instance running apps.
+Checks are automated and built in, it runs at every minute to return a pass or
+fail status. If all check passes the overall status of instance is `OK`. If one
+or more failed the overall status is `Impaired`.
+
 ### Instance Classes
 
 - general purposes (`T*`)
@@ -61,7 +68,7 @@ defined max spot price with 2 minute grace period. Interruption refers to
 returning instance when AWS EC2 needs the capacity back in exchange for steep
 discounts.
 
-![ec2 spt life](ec2-spt-lc.PNG)
+![ec2 spt life](../static/ec2-spt-lc.PNG)
 
 > validate from/until can be infinite
 
@@ -113,7 +120,9 @@ fast boot/config time through prepackaging. AMI are bounded by region, and can
 be copied across region. AWS marketplace can find AMIs for sale.
 
 To create AMI first start EC2 instance in desired config and install desired
-software. Stop the instance and build AMI by choosing `create image`.
+software. Stop the instance and build AMI by choosing `create image`. When
+copying AMI across region, it first creates a snapshot, then the AMI and lastly
+user manually starts the EC2 instance.
 
 ## Application Scalability
 
@@ -137,8 +146,6 @@ running. ASG registers new instance with load balancer. ASG will try to
 recreate EC2 instance that marked unhealty and gets termination signal from
 ELB.
 
-A launch template is requires for ASG to work with the following informations,
-
 - AMI + instance type
 - EC2 user data
 - EBS volume
@@ -150,8 +157,18 @@ A launch template is requires for ASG to work with the following informations,
 - load balancer information
 - min/max capacity and initial capacity
 
+Launch Template and Launch Configuration are generally similar except for the
+following items,
+
+- Launch Template allows for multiple versioning (e.g. base template and derivatives)
+- Launch Template have access to newer AMIs
+- Launch Template allows ASG to launch mixed Sport and On-Demand instances
+
 Besides ELB, ASG can scale based on CloudWatch Alarms e.g. average CPU. The
 metric is computed for overall ASG instance.
+
+> note default healthcheck is not ELB when the group's healthcheck is set to
+> EC2
 
 #### Scaling Policies
 
@@ -167,11 +184,28 @@ prevent scaling after scaling process completed/allow metric stabilization.
 
 #### ASG Lifecycle Hook
 
-![asg lc hook](asg-lc-hook.PNG)
+![asg lc hook](../static/asg-lc-hook.PNG)
 
 Lifecycle hook allows custom action for ASG to act when an instance moves into
 a wait state due to lifecycle hook with a grace period. Once it timeouts it
-transits to the next state, by default its an hour and can be extended.
+transits to the next state, by default its an hour and can be extended. There is
+a healthcheck grace period for instance to get ready.
+
+#### ASG suspending, resuming and termination
+
+Suspend ASG temporarily to investigate failed process or prevent marking
+instance unhealthy while replacing them.
+
+- suspend `ReplaceUnhealthy`, update and set instance to healthy before reactivating it
+- put instance to standby, update exit standby state and return to service
+  - they are part of ASG but do not servce traffic
+
+Termination of instances is based on the following priority
+
+1. AZ with most instance and at least one not protected from scale in
+2. determine instances to terminate to align remaining instances to allocation strategy for on demang and spot instances
+3. oldest launch template/launch configuration
+4. instances closest to next billing hour
 
 ## AWS Lambda
 
@@ -190,11 +224,11 @@ it instead.
 
 (S3 event notification) Event triggered job
 
-![s3 evnt noti](s3-evnt-noti.PNG)
+![s3 evnt noti](../static/s3-evnt-noti.PNG)
 
 Serverless CRON job
 
-![eb lmda](eb-lmda.PNG)
+![eb lmda](../static/eb-lmda.PNG)
 
 Pricing is based on per calls and per duration.
 
@@ -207,6 +241,8 @@ Pricing is based on per calls and per duration.
 - $1 per 600,000GBs
 
 ### lambda limitation
+
+> can be packaged and deploy as container image
 
 Lambda is region bounded service with some limitation with its execution and
 deployment.
@@ -234,12 +270,20 @@ address connection issue with there is a surge of lambda function. Lambda
 function in this case must be launched within the same VPC as RDS proxy as it
 is never publicly available. [1]
 
+If code reused is intended for Lambda function, consider creating Lambda Layer
+for reusable code.
+
+Lambda can be scale quickly and it is better to have control in place to nofify
+when there is a spike through CloudWatch Alarm on metrics `ConcurrentExecutions`
+or `Invocation exceeds your threshold`. AWS budget for daily cost monitoring can
+also be used.
+
 ### Lambda SnapStart
 
 Option to improve Java 11 and above performance by 10x with no extra cost. It
 is achieved by using Java AOT.
 
-![lmda ss](lmda-ss.PNG)
+![lmda ss](../static/lmda-ss.PNG)
 
 ## Edge Function
 
@@ -263,7 +307,7 @@ A few use case would be,
 
 ## CloudFront Function
 
-![cf fn](cf-fn.PNG)
+![cf fn](../static/cf-fn.PNG)
 
 | CloudFront Function | Lambda@Edge |
 |-|-|

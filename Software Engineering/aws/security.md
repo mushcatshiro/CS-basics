@@ -17,7 +17,7 @@ There are two types keys
 - symmetric (AES-256)
   - single encryption key for both encrypt and decrypt
   - AWS services integrated with KMS uses this
-  - such KMS keys are not possible to get unencrypted KMS keys (only use KMS API to use)???
+  - such KMS keys are not possible to get unencrypted KMS keys (only use KMS API/internal use)
 - asymetric (RSA, ECC key pairs)
   - public for encrypt and private for decrypt
   - user for encrypt/decrypt or verify/sign operations
@@ -42,7 +42,7 @@ snapshoted with same KMS key then re-encrypt with a different key that lives in
 the target region. When restoring the snapshot into volume, same KMS key in the
 destiny region is used.
 
-![snap kms](snap-kms.PNG)
+![snap kms](../static/snap-kms.PNG)
 
 ### KMS Key Policies
 
@@ -56,8 +56,6 @@ managing cross-account access of KMS keys.
 Cross account snapshot copying is similar to EBS cross region copying except
 a custom KMS Key Policy is needed to authorize cross-account access to the KMS
 key.
-
-> destination account uses KMS key in source account to decrypt
 
 ### Multi-Region Keys
 
@@ -82,11 +80,11 @@ which protect against even database admins. Client app on different regions can
 decrypt the information. Similar technique can be applied on global Aurora to
 have column level protection.
 
-![mrk-ddb](mrk-ddb.PNG)
+![mrk-ddb](../static/mrk-ddb.PNG)
 
 ### S3 Replication with Encryption
 
-> check ![S3 Bucket Replication](storage.md#s3-bucket-replication)
+> check [S3 Bucket Replication](storage.md#s3-bucket-replication)
 
 Unencrypted objects and SSE-S3 encrypted objects are replicated by default and
 SSE-C objects can be replicated. For SSE-KMS objects, option must be enabled
@@ -99,7 +97,9 @@ alleviate by asking for service quota increase.
 > key
 
 Multi region key can be used but they are still treated as independent key by
-S3 i.e. object still gets encrypted and decrypted.
+S3 i.e. object still gets encrypted and decrypted. S3 do not support converting
+existing single region key to multi region key to protech data residency and
+data sovereignty property. A new S3 must be created for changing key.
 
 ### AMI sharing with KMS encryption
 
@@ -107,6 +107,13 @@ AMI in source account must first modify the image attribute such that the
 target account has `Launch Permission` and KMS keys must have appropriate Key
 Policy. In the target account, the role or user should have permission to
 `DescribeKey`, `ReEncrypted`, `CreateGrant` and `Decrypt`.
+
+### Key deletion
+
+KMS key deletion is destructive and potentially dangerous therefore KMS enforces
+a waiting period. Deletion of key is essentially scheduling it. A minimum of 7
+days up to 30 days can be customized with default of 30 days. To reverse, just
+cancel and key is recovered.
 
 ## SSM Parameter Store
 
@@ -192,6 +199,9 @@ prior to expiration (no of days can be configured). Alternatively, one can use
 AWS Config's managed rule `acm-certificate-expiration-check` to achieve the
 same.
 
+> there is no auto renewal but the rule will still show NON_COMPLAINT for
+> expiring certificates
+
 ## AWS Web Application Firewall
 
 Protects web application from common L7 web exploits. It is deployed on ALB,
@@ -217,13 +227,14 @@ Provides DDoS protection with two modes,
 
 - AWS Shield Standard
   - free service for all AWS customer
-  - provide protection from SYN/UDP flood, reflection attach and other L3/4 attacks
-- AWS Shield Advanded
+  - provide protection from SYN/UDP flood, reflection attackand other L3/4 attacks
+- AWS Shield Advanced
   - optional DDoS mitigation service ($3000 per month per organization)
   - protect against more sophisticated attach on EC2/ELB/CloudFront/Global Accelerator and R53
   - 24/7 AWS DDoS response team
   - protect against higher fees during usage spike
   - it automatically creates, evaluates and deploys AWS WAF rules to mitigate L7 attacks
+  - enabled consolidated bill for multiple accounts to only get charged once
 
 ## Firewall Manager
 
@@ -286,10 +297,8 @@ deploy WAF rules for L7 attacks.
 - API Gateway (+WAF): burst limits, headers filtering, API keys
 - ELB
 
-Hides backend.
-
-Security groups and Network ACLs can filter IPs at subnet and ENI level. Also
-Elastic IP are protected by AWS Shield Advanced.
+Hides backend. Security groups and Network ACLs can filter IPs at subnet and ENI
+level. Also Elastic IP are protected by AWS Shield Advanced.
 
 ## GuardDuty
 
@@ -302,8 +311,11 @@ at
 - DNS logs
 - other logs (EKS, RDS, ....)
 
+> think account and networks
+
 EventBridge rules can be setup to notify on the findings and bridged to SNS or
-lambda. It also has a deficated finding for crypto currency attacks.
+lambda. It also has a dedicated finding for crypto currency attacks. Disabling
+the service will delete all remaining data including findings and configuration.
 
 ## Amazon Inspector
 

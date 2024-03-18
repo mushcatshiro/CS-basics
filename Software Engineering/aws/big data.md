@@ -32,7 +32,7 @@ Allows user to run SQL queries across data stored in relational,
 non-relational, object and custom data sources (AWS/on-prem) using data source
 connectors that run with Lambda. Queried results can be stored to S3.
 
-![fed-q](fed-q.PNG)
+![fed-q](../static/fed-q.PNG)
 
 ## RedShift
 
@@ -70,7 +70,8 @@ region.
 
 Query data in S3 without loading to RedShift cluster. RedShift cluster issue
 a query command to RedShift Spectrum to launch thousands of Spectrum nodes to
-queryn S3.
+query in S3. These resides on dedicated RedShift servers independent of the
+RedShift cluster.
 
 ## Amazon OpenSearch
 
@@ -90,11 +91,11 @@ OpenSearch Dashboards.
 
 OpenSearch DDB common pattern
 
-![os-pat-1](os-pat-1.PNG)
+![os-pat-1](../static/os-pat-1.PNG)
 
 OpenSearch CloudWatch Logs and KDS common pattern
 
-![os-pat-2](os-pat-2.PNG)
+![os-pat-2](../static/os-pat-2.PNG)
 
 ## EMR
 
@@ -150,6 +151,8 @@ analytics. A few use cases including
 - extract data from S3 and RDS, transform and load to RedShift
 - extract/import csv in S3, transform it to parquet and load to S3 for Athena
   - S3 event notification to Lambda fn/EventBridge to trigger Glue ETL job
+
+Note requires scripting (py/scala).
 
 ### Glue Data Catalog
 
@@ -228,4 +231,4 @@ automatically provision resources and scales the compute and storage nodes.
 | shard spliting and merging for scaling | only adding partition to topic for scaling (no scale down option) |
 | TLS in-flight encryption | plain text or TLS |
 | KMS at rest encryption | KMS at rest encryption |
-| data retention ? | data can be kept permanently |
+| 1-365 days | data can be kept permanently |

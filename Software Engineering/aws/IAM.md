@@ -1,14 +1,18 @@
-# IAM
+# Identity Access Management
 
-> TODO seems unstructered
+## Terminology
 
-Idendentity Access Management.
+Principal is a human user or workload that can make request for an action on
+AWS. After authentication it can be granted permanent or temporary credential to
+make request to AWS. IAM and root users are permanent and roles are temporary
+credentials. 
 
-Root user creates users and groups. In AWS groups can only contain users, no
-groups. Access in AWS is managed by policies and attaching them to IAM
-identities or AWS resources. These policies defines permission and evaluated
-when a request is made. Policies are usually in JSON format except access
-control list. There are 6 types of policies
+Authorization essentially is a check of the policies. AWS denies by default.
+Defaults are override if there is explicit allow (identity or resource based).
+Then Organization SCP, IAM permission boundary or session policy overrides the
+allow (all must agree to allow). Policies are attached IAM identities or AWS
+resources. Policies are usually in JSON format except access control list. There
+are 6 types of policies
 
 - identity based policies
 - resource based policies: S3 bucket policies and IAM role policies
@@ -17,10 +21,52 @@ control list. There are 6 types of policies
 - access control list
 - session policies
 
-Policies can be inherited from groups. Inline policies are for single IAM
-entity (user, group, role) e.g. resource or IAM identity that is not in user
-group. Inline policies are one to one binding and are deleted when entity is
-deleted.
+> for cross account request, both requester and resource must have appropriate
+> identity policy and resource policy that allows the request.
+
+### Identity Based Policies
+
+There are three type of identity based policies, AWS managed, customer managed
+and inline policy. AWS managed policy is created and managed by AWS. It has a
+ARN. It is a convienient way to assign appropriate permission to users, role and
+groups. It can not be modified and when AWS modify it it affects all principals
+the policy is attached to.
+
+Customer managed policies have more flexibility in term of modification. When
+there is a change in the policy, it does not overwrites the existing one. A new
+version is created and AWS stores up to five versions. Revert to earlier version
+is possible.
+
+Inline policy is useful if a one to one relationship is required. They are
+deleted when the identity is deleted. Two roles can have the same inline policy
+but owns a copy of the policy.
+
+> EventBridge is a unique services that requires both resource based policy and
+> IAM roles to interact with other AWS services.
+
+## Users in AWS
+
+Users can be IAM or IAM Identity Center users. THe latter have temporary
+credentials established everytime they are signed in. Such credentials is
+recommended to have an identity provider. Root user is the account used to
+create AWS account. A best practice is to only allow temporary credentials for
+human users, if needed a long term credentials ensure to update access key when
+needed. If the organization has a way of authentication it can be federated to
+AWS through IAM or IAM Identity Center.
+
+### User Groups
+
+A collection of IAM users. Used to specify permissions for multiple users.
+Identity based policy can be applied to groups. However User Group's `principal`
+cannot be identified in a policy e.g. resource based policy as it is not meant
+for authentication.
+
+## IAM Roles
+
+IAM identity created with specific permission that allows anyone to assumes it.
+Roles are meant to delegate access to users, apps or services that have no
+access to AWS resource. Roles can also be users in a different AWS account. When
+a role is assumed, it gives up their original permissions.
 
 Policies can be build in IAM Policy Builder in the following policy structure,
 
@@ -87,16 +133,13 @@ A user with additional permission policy will not be able to create iam user as
 Permission boundaries superceeds the permission policy. It is usually used
 together with Organization SCP.
 
-As for between resource based policy and identity based policy, AWS first looks
-for explicit deny. If there is, its denied; If there isn't, AWS looks for an
-explicit allow. As long as there is one allow, the request is allowed.
+![iam-eval](../static/iam-eval.PNG)
 
-![iam-eval](iam-eval.PNG)
-
-## IAM conditions
+### IAM conditions
 
 ```json
 // aws:SourceIp -> restrict client from which the api call being made
+// aws:RequestedRegion -> region that actually spawns instance
 {
   // ...
   "condition": {
@@ -128,17 +171,49 @@ explicit allow. As long as there is one allow, the request is allowed.
 - `aws:MultiFactorAuthPresent`
 - `aws:RequestedRegion`
 
-### IAM Roles vs Resource Based Policies
+## Organization
 
-Assuming roles gives up existing role's access and only having assumed role's,
-resource based policy does not require the principal to give up their
-premissions. More AWS services allows resource based policy.
+A global service to managed multiple AWS accounts. The main account is the
+management account and others are member account. A single member account can
+only be part of one organization. Organization allows billing to be
+consolidated. Such single payment gives pricing benefits from aggregated usage.
+Shared reserved instance and savings plan discounts are shared. AWS provides an
+api to automate account creation.
 
-EventBridge is a unique services that requires both resource based policy and
-IAM roles to interact with other AWS services. For now,
+![org](../static/org.PNG)
 
-- resource based policy: SNS/SQS/CloudWatch Logs/API Gateway/Lambda
-- IAM role: KDS/Systems Manager Run Command/ECS task
+Organization Units are commonly organized by business unit, environment
+lifecycle or projects-based. Organization provides benefits such as
+
+- multiple account as a separation vs single account multi VPC separation
+- use tags for billing purposes
+- enable CloudTrail on all accounts and log to central S3
+- send CloudWatch to central logging account
+- establish cross account role for admin purposes
+- Service Control Policies (SCP) for security
+  - IAM policy to apply on OU/accounts except mgmt to restrict users and roles
+  - by default denies all access, requires explicit allow
+  - OU deny but account allow still results in deny
+  - allowlist and blocklist strategy
+- backup policies - organization wide backup plan for compliance
+- tag policies to standardize tags used on all resources
+
+Moving AWS account between two Organization requires old Org. to remove, new Org
+to send invite and re-accept.
+
+### Resource Access Manager (RAM)
+
+Securely share resources across AWS accounts within Organization (Organization
+Unit) with IAM roles and users.
+
+#### VPC Sharing
+
+Allowing multiple AWS accounts to create appication resource into shared and
+centrally managed VPCs. The onwer of VPC shares one or more subnets with other
+accounts belong to the same Organization. Only shared resources is visible to
+participants.
+
+![ram vpc share](ram-vpc-share.PNG)
 
 ## Password Management
 
@@ -170,11 +245,6 @@ password lost or hacked to prevent account compromise. Virtual MFA with
 
 or hardware like keyfob MfA device and US goverment AWS govcloud keyfob.
 
-## IAM roles
-
-IAM roles are for AWS resources. This allows services to perform on behalf of
-users. A few examples including EC2, lambda and ECS task.
-
 ## Security Tools
 
 IAM credential report: account level list of all user and status of various
@@ -191,7 +261,7 @@ users generally are outside of AWS account.
 
 - Cognito User Pool (authentication)
   - sign in functionality for app users
-  - integrate with API gateway and ALB
+  - integrate with API gateway and ALB (CloudFront requires lambda@edge)
 - Cognito Identity Pool (authorization)
   - provide temporary AWS credentials to users to access AWS resource directly
   - works with Cognito User Pool as an identity provider
@@ -202,7 +272,7 @@ Creates a serverless database of users for web and mobile app through simple
 username/password login. It supports password reset, email/phone number
 verification, MFA and federated identities from FB, Google, SAML etc.
 
-![cup](cup.PNG)
+![cup](../static/cup.PNG)
 
 ### Cognito Identity Pool
 
@@ -214,51 +284,24 @@ based on `user_id` for fine grain control. A default IAM role can be defined
 such that users (guest or authenticated) that dont have specific roles can
 inherit from the default IAM role.
 
-![cip](cip.PNG)
+![cip](../static/cip.PNG)
 
 With Cognito Identity Pool, a row level security in DynamoDB can be setup such
 that only if the leading key of DynamoDB is same as the cognito `user_id`, the
 user can perform certain action.
-
-## Organization
-
-A global service to managed multiple AWS accounts. The main account is the
-management account and others are member account. A single member account can
-only be part of one organization. Organization allows billing to be
-consolidated. Such single payment gives pricing benefits from aggregated usage.
-Shared reserved instance and savings plan discounts are shared. AWS provides an
-api to automate account creation.
-
-![org](org.PNG)
-
-Organization Units are commonly organized by business unit, environment
-lifecycle or projects-based. Organization provides benefits such as
-
-- multiple account as a separation vs single account multi VPC separation
-- use tags for billing purposes
-- enable CloudTrail on all accounts and log to central S3
-- send CloudWatch to central logging account
-- establish cross account role for admin purposes
-- Service Control Policies (SCP) for security
-  - IAM policy to apply on OU/accounts except mgmt to restrict users and roles
-  - by default denies all access, requires explicit allow
-  - OU deny but account allow still results in deny
-  - allowlist and blocklist strategy
-- backup policies - organization wide backup plan for compliance
-- tag policies to standardize tags used on all resources
 
 ## AWS IAM Identity Center (was AWS SSO)
 
 Single sign on service for all AWS accounts in AWS organization, business cloud
 application (Salesforce, Box, Microsoft 365 etc), SAML2.0-enabled apps, EC2
 Windows instances. Identity providers can be build in in IAM identity center or
-3rd party e.g. AD, OngLogin, Okta...
+3rd party e.g. AD, OneLogin, Okta...
 
-![sso](sso.PNG)
+![sso](../static/sso.PNG)
 
 How users linked to groups, to permisison sets and to specific accounts.
 
-![usr-to-acc-link](usr-to-acc-link.PNG)
+![usr-to-acc-link](../static/usr-to-acc-link.PNG)
 
 ### Active Directory Setup
 
@@ -266,6 +309,8 @@ How users linked to groups, to permisison sets and to specific accounts.
 - self managed directory
   - create a two way trust relation using AWS managed Microsoft AD (ootb int.)
   - use AD connector
+
+> no support of msft distributed file system
 
 ### Fine grouned permission and assignments
 
@@ -314,10 +359,3 @@ Tower offers guardrails to ensure compliance in two modes
 With Control Tower, environment can be setup in few clicks and a monitoring
 dashboard is provided.
 
-## scratchpad
-
-allow to impersonate? (whats the service/context)
-
-billing info to set budge
-
-general intro to region/AZ/POP etc

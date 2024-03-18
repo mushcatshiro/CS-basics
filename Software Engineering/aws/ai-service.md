@@ -56,7 +56,7 @@ call centers.
 
 flow of scheduling an appointment
 
-![lex-connect](lex-connect.PNG)
+![lex-connect](../static/lex-connect.PNG)
 
 ## Comprehend
 

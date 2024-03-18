@@ -77,7 +77,7 @@ needed and all output can be shown in AWS Console, send to S3 or CloudWatch
 Logs. Command status can be send as notifications to SNS. It is fully
 integrated with IAM, CloudTrail and EventBridge.
 
-![run cmd](run-cmd.PNG)
+![run cmd](../static/run-cmd.PNG)
 
 ### Patch Manager
 
@@ -102,7 +102,7 @@ Simplifies common tasks e.g. maintenance, deployment and etc of EC2 instances
 and other AWS resources. Automation Runbook/SSM documents defines the action to
 perform on the resources (pre-defined/custom).
 
-![ssm auto](ssm-auto.PNG)
+![ssm auto](../static/ssm-auto.PNG)
 
 ## AWS Cost Explorer
 
@@ -181,7 +181,7 @@ Authentication, Storage, API (REST, GraphQL), CI/CD, Pub/Sub, Analytics, AI/ML,
 monitoring and etc. Able to connect to source code management online repository
 e.g. GH, BB or direct upload.
 
-![amp](amp.PNG)
+![amp](../static/amp.PNG)
 
 ## AWS Truster Advisor
 

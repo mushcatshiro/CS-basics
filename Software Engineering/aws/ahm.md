@@ -165,7 +165,7 @@ beyond 90 days, log them to S3 (and use Athena)
 
 ### EventBridge Integration
 
-![ct-eb-int](ct-eb-int.PNG)
+![ct-eb-int](../static/ct-eb-int.PNG)
 
 ## AWS Config
 
@@ -185,7 +185,7 @@ when there is a change or periodically.
 
 Despite no denying of action happening, remediations can be automated for non
 complaint resource using SSM automation documents (AWS managed or custom,
-basically lambda fn). Remediations can have retried if the resource is still
+basically lambda fn). Remediations can be retried if the resource is still
 non compliant after auto-remediations. Compliance of resource, configuration of
 resource and CloudTrail api call of resource over time can be viewed in the UI
 (timeline format).
